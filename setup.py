@@ -30,5 +30,6 @@ setup( name                 = NAME,
        install_requires     = [ "boto>=2.38.0",
                                 "nose",
                                 "mock",
+                                "moto",
                                 "pysftp" ],
        test_suite           = "nose.collector" )

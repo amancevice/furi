@@ -3,7 +3,6 @@
 
 import collections
 import os
-import re
 import urlparse
 
 
@@ -20,7 +19,7 @@ class File(collections.Iterable):
 
     def __init__(self, uri, mode='r'):
         if mode not in self.modes and not set(mode).issubset(self.modes):
-            raise TypeError("Cannot open %s in %s-mode" % (type(self).__name__, mode))
+            raise ValueError("Cannot open %s in %s-mode" % (type(self).__name__, mode))
         self.uri  = urlparse.urlparse(uri)
         self.path = self.uri.path
         self.mode = mode
@@ -84,7 +83,7 @@ class RemoteFile(File):
             self._connection = self.connect()
             return self._connection
 
-    def connect(self):
+    def connect(self, **kwargs):
         """ Connect to remote. """
         raise NotImplementedError
 

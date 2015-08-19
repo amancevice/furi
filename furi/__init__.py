@@ -1,16 +1,21 @@
 """ fURI File access through URIs. """
 
 
+__author__ = 'amancevice'
+
+
 import os
 import urlparse
-from . import base, s3, sftp
+from .base import File, RemoteFile
+from .s3   import S3File
+from .sftp import SftpFile
 
 
 _DISPATCHER = {
-    ''     : base.File,
-    'file' : base.File,
-    's3'   : s3.S3File,
-    'sftp' : sftp.SftpFile }
+    ''     : File,
+    'file' : File,
+    's3'   : S3File,
+    'sftp' : SftpFile }
 
 
 def open(uri, **kwargs):
@@ -37,9 +42,9 @@ def download(source, target=None, **credentials):
     src.connect(**credentials)
     tgt = open(target or os.path.expanduser("~/Downloads/%s" % src.filename), mode='rw')
 
-    if not isinstance(src, base.RemoteFile):
+    if not isinstance(src, RemoteFile):
         raise TypeError("Cannot download from non-RemoteFile.")
-    if isinstance(tgt, base.RemoteFile):
+    if isinstance(tgt, RemoteFile):
         raise TypeError("Cannot download RemoteFile to other RemoteFile. Use local URI.")
 
     return src.download(tgt)
