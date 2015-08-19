@@ -11,67 +11,62 @@ pip install furi
 
 ## Usage
 
-### Read a local file
-
 ```python
 import furi
 
 local = furi.open('/Users/amancevice/path/to/some/file.ext')
 print local.read()
 # => Hello, world!
+
+s3 = furi.open('s3://bucket/path/to/key')
+print s3.read()
+# => Hello from S3!
+
+sftp = furi.open('sftp://user:pass@host/path/to/file.ext')
+print sftp.read()
+# => Hello from SFTP
 ```
 
-### Read an S3-backed remote file
+## S3-backed files
 
-boto credentials in ~/.boto or ENV
+Connect to S3 by supplying `access_key` & `secret_key`, or by creating the file `~/.boto` with contents:
+
+```bash
+# ~/.boto
+[Credentials]
+aws_access_key_id = ACCESS_KEY_HERE
+aws_secret_access_key = SECRET_KEY_HERE
+```
+
+Example S3-file access:
 ```python
+# Use ~/.boto
 s3file = furi.open('s3://bucket/path/to/key')
-print s3file.read()
-# => Hello, world!
-```
 
-Manually provide credentials
-```python
+# Supply credentials
 s3file = furi.open(
     's3://bucket/path/to/key', access_key='ACCESS', secret_key='SECRET' )
-print s3file.read()
-# => Hello, world!
 ```
 
-### Download an S3-backed remote file by URI
+## SFTP-backed files
 
-Use default ~/Downloads/ location
+Supply the credentials as a part of the URI
+
 ```python
-local = furi.download('s3://bucket/path/to/key')
-print local.path
-# => ~/Downloads/key
+sftpfile = furi.open('sftp://user:password@host/workdir/file.ext')
 ```
 
-Custom download location
-```python
-local = furi.download('s3://bucket/path/to/key', '/abs/path/to/download/key')
-print local.path
-# => /abs/path/to/download/key
-```
+## Download remote files
 
-Manually provide credentials and download location
 ```python
-local = furi.download(
+# Default download location will be ~/Downloads/key
+furi.download('s3://bucket/path/to/key')
+
+# Supply custom download location
+furi.download('s3://bucket/path/to/key', '~/path/to/key')
+
+# Supply AWS keys inline
+furi.download(
     's3://bucket/path/to/key', '/abs/path/to/download/key', 
     access_key='ACCESS', secret_key='SECRET' )
-```
-
-### Write to an s3-backed remote file
-
-Write a string
-```python
-s3file = furi.open('s3://bucket/path/to/key', mode='w')
-s3file.write("Hello, world!")
-```
-
-Write a stream
-```python
-local  = furi.open('/abs/path/to/file.ext')
-s3file = furi.open('s3://bucket/path/to/key', mode='w')
-s3file.write(local.stream())
 ```
