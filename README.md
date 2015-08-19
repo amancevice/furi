@@ -70,3 +70,16 @@ furi.download(
     's3://bucket/path/to/key', '/abs/path/to/download/key', 
     access_key='ACCESS', secret_key='SECRET' )
 ```
+
+## Supported operations
+
+```python
+furifile = furi.open('<uri>', mode='<mode')  # Open a file in a supported open-mode
+furifile.exists()                            # Test if file exists
+furifile.matches('regex pattern')            # Match pattern to filename (not including path)
+furifile.read()                              # Read file contents' stream as string
+furifile.stream()                            # Get handle to file contents stream
+furifile.write('str or stream')              # Write a string or stream to file
+
+furifile.connect(**credentials)              # Connect to a remote file service (such as S3)
+```

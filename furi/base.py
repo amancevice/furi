@@ -3,6 +3,7 @@
 
 import collections
 import os
+import re
 import urlparse
 
 
@@ -38,11 +39,11 @@ class File(collections.Iterable):
         """ Filename matches pattern.
 
             Arguments:
-                pattern (regex):  Regular Expression to match.
+                pattern (regex or str):  Regular Expression to match.
 
             Returns:
                 RegEx match object. """
-        return pattern.match(self.filename)
+        return re.compile(pattern).match(self.filename)
 
     def exists(self):
         """ Test file existence. """
