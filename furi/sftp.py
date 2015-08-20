@@ -26,7 +26,8 @@ class SftpFile(base.RemoteFile):
 
     def download(self, target):
         """ Download remote file to local target URI. """
-        raise NotImplementedError
+        self.connection.get(self.filename, str(target))
+        return target
 
     def exists(self):
         """ Test file existence. """

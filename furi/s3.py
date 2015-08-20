@@ -70,4 +70,4 @@ class S3File(base.RemoteFile):
 
     def _stream_impl(self):
         """ Implementation of stream(). """
-        return io.StringIO(unicode(self.key.get_contents_as_string()))
+        return self.key

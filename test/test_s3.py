@@ -54,6 +54,5 @@ def test_write():
 
     s3furi = furi.open('s3://furi/foo/bar/bizz/buzz', mode='w')
     s3furi.write(value)
-    s3furi.stream().seek(0)
     assert_equal(s3furi.read(), value)
 
