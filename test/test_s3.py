@@ -56,3 +56,15 @@ def test_write():
     s3furi.write(value)
     assert_equal(s3furi.read(), value)
 
+@moto.mock_s3
+def test_write_stream():
+    value = "Hello, world!\n\nGoodby, cruel world."
+    ms3   = boto.connect_s3()
+    bkt   = ms3.create_bucket('furi')
+
+    s3furi1 = furi.open('s3://furi/foo/bar/bizz/buzz', mode='w')
+    s3furi1.write(value)
+    s3furi2 = furi.open('s3://furi/foo/bar/bizz/fizz', mode='w')
+    s3furi2.write(s3furi1.stream())
+
+    assert_equal(s3furi1.read(), s3furi2.read())
