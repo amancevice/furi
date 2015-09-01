@@ -18,6 +18,20 @@ _DISPATCHER = {
     'sftp' : SftpFile }
 
 
+def add_handler(scheme, handler_class):
+    """
+    Add a new class to the dispatcher
+
+    Arguments:
+        scheme        (str): URI prefix
+        handler_class (class): Reference to class that extends furi.base
+
+    Returns:
+        None
+    """
+    _DISPATCHER[scheme] = handler_class
+
+
 def open(uri, **kwargs):
     """ Returns a File object given a URI. """
     uri = urlparse.urlparse(os.path.expanduser(uri))
