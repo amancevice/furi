@@ -19,16 +19,11 @@ _DISPATCHER = {
 
 
 def add_handler(scheme, handler_class):
-    """
-    Add a new class to the dispatcher
+    """ Add a new class to the dispatcher
 
-    Arguments:
-        scheme        (str): URI prefix
-        handler_class (class): Reference to class that extends furi.base
-
-    Returns:
-        None
-    """
+        Arguments:
+            scheme        (str):    URI scheme prefix
+            handler_class (class):  Reference to class that extends furi.base """
     _DISPATCHER[scheme] = handler_class
 
 
