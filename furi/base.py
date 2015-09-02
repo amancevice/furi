@@ -35,6 +35,12 @@ class File(collections.Iterable):
     def __iter__(self):
         return self.stream()
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        pass
+
     def matches(self, pattern):
         """ Filename matches pattern.
 

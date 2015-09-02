@@ -1,5 +1,8 @@
 # furi Changelog
 
+0.0.4
+* Added no-op __enter__ and __exit__ definitions for "with" functionality
+
 0.0.3
 * Allow users to supply their own handlers.
 
