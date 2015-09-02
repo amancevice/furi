@@ -3,6 +3,8 @@
 
 import boto
 import io
+import os
+import re
 from . import base
 
 
@@ -67,6 +69,28 @@ class S3File(base.RemoteFile):
             return self.key.set_contents_from_string(stream)
         except AttributeError:
             return self.key.set_contents_from_string(stream.read())
+
+    def walk(self, **kwargs):
+        root = str(re.sub('^/', '', self.key.name))
+        tree = { root : { 'dirnames' : set(), 'filenames' : set() } }
+        for key in self.bucket.list(root):
+            rel, filename = map(str, os.path.split(re.split("^%s" % root, key.name)[-1]))
+            history = root
+            for subdir in rel.split('/'):
+                if subdir:
+                    tree[history]['dirnames'].add(subdir)
+                history = os.path.normpath(os.path.join(history, subdir)) + '/'
+                if history not in tree:
+                    tree[history] = { 'dirnames' : set(), 'filenames' : set() }
+            if filename:
+                tree[history]['filenames'].add(filename)
+
+        for dirpath in sorted(tree.keys()):
+            dirdata   = tree[dirpath]
+            dirnames  = sorted(dirdata['dirnames'])
+            filenames = sorted(dirdata['filenames'])
+            dirpath = "s3://%s/%s" % (self.bucket.name, dirpath)
+            yield dirpath, dirnames, filenames
 
     def _stream_impl(self):
         """ Implementation of stream(). """

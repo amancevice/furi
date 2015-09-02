@@ -79,6 +79,10 @@ class File(collections.Iterable):
             self._stream = self._stream_impl()
             return self._stream
 
+    def walk(self, **kwargs):
+        """ Walk the contents of a directory. """
+        return os.walk(self.path, **kwargs)
+
     def _stream_impl(self):
         """ Implementation of stream(). """
         return open(self.path, self.mode)
@@ -110,6 +114,10 @@ class RemoteFile(File):
 
     def write(self, stream):
         """ Write stream to file. """
+        raise NotImplementedError
+
+    def walk(self, **kwargs):
+        """ Walk the contents of a directory. """
         raise NotImplementedError
 
     def _stream_impl(self):
