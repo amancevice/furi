@@ -41,6 +41,9 @@ class File(collections.Iterable):
     def __exit__(self, type, value, traceback):
         pass
 
+    def close(self):
+        return self.stream().close()
+
     def matches(self, pattern):
         """ Filename matches pattern.
 
@@ -61,7 +64,10 @@ class File(collections.Iterable):
 
     def write(self, stream):
         """ Write stream to file. """
-        return self.stream().write(stream)
+        try:
+            return self.stream().write(stream)
+        except TypeError:
+            return self.stream().write(stream.read())
 
     def stream(self):
         """ Get file contents as stream. """
