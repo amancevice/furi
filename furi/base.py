@@ -97,8 +97,7 @@ class RemoteFile(File):
         try:
             return self._connection
         except AttributeError:
-            self._connection = self.connect()
-            return self._connection
+            return self.connect()
 
     def connect(self, **kwargs):
         """ Connect to remote. """
