@@ -8,6 +8,9 @@ import tempfile
 from . import base
 
 
+__all__ = ['SftpFile']
+
+
 class SftpFile(base.RemoteFile):
     """ File on SFTP server.
 

@@ -7,6 +7,7 @@ import re
 import urlparse
 
 
+__all__ = ['File', 'RemoteFile']
 MODES = 'r', 'rb', 'r+', 'rb+', 'w', 'wb', 'w+', 'wb+', 'a', 'ab', 'a+', 'ab+'
 
 

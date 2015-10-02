@@ -7,6 +7,9 @@ import re
 from . import base
 
 
+__all__ = ['S3File']
+
+
 class S3File(base.RemoteFile):
     """ S3-backed file implementation.
 
