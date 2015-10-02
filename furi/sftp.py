@@ -5,7 +5,6 @@ import io
 import pysftp
 import re
 import tempfile
-import urlparse
 from . import base
 
 

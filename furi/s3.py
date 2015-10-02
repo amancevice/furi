@@ -2,7 +2,6 @@
 
 
 import boto
-import io
 import os
 import re
 from . import base

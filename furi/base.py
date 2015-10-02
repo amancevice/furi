@@ -42,6 +42,7 @@ class File(collections.Iterable):
         pass
 
     def close(self):
+        """ Close stream. """
         return self.stream().close()
 
     def matches(self, pattern):
