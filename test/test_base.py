@@ -34,6 +34,16 @@ def test_read():
         assert_equal(returned, expected)
 
 
+def test_stream_resets():
+    with open(__file__, 'r') as this:
+        furifile = furi.open(__file__)
+        stream = furifile.stream()
+        stream.read()
+        returned = furifile.read()
+        expected = this.read()
+        assert_equal(returned, expected)
+
+
 def test_write():
     value = "Hello, world!\n\nGoodby, cruel world."
     with tempfile.NamedTemporaryFile() as tmp:

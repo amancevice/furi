@@ -1,7 +1,9 @@
 """ fURI File access through URIs. """
 
 
-__author__ = 'amancevice'
+__author__  = "amancevice"
+__email__   = "smallweirdnum@gmail.com"
+__version__ = "0.2.0"
 
 
 import os

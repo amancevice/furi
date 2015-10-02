@@ -1,11 +1,12 @@
+import furi
 import os
 from setuptools import setup
 
-NAME    = 'furi'
-VERSION = '0.1.0'
-AUTHOR  = 'amancevice'
-EMAIL   = 'smallweirdnum@gmail.com'
-DESC    = 'fURI File Access through URIs'
+NAME    = furi.__name__
+VERSION = furi.__version__
+AUTHOR  = furi.__author__
+EMAIL   = furi.__email__
+DESC    = furi.__doc__
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()

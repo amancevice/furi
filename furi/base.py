@@ -72,6 +72,7 @@ class File(collections.Iterable):
     def stream(self):
         """ Get file contents as stream. """
         try:
+            self._stream.seek(0)
             return self._stream
         except AttributeError:
             if not self.exists() and 'w' not in self.mode:
