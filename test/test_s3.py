@@ -68,3 +68,34 @@ def test_write_stream():
     s3furi2.write(s3furi1.stream())
 
     assert_equal(s3furi1.read(), s3furi2.read())
+
+@moto.mock_s3
+def test_walk():
+    value = "Hello, world!\n\nGoodby, cruel world."
+    ms3   = boto.connect_s3()
+    bkt   = ms3.create_bucket('furi')
+
+    with furi.open('s3://furi/foo/', mode='w') as s3k:
+        s3k.write('')
+    with furi.open('s3://furi/foo/bar/', mode='w') as s3k:
+        s3k.write('')
+    with furi.open('s3://furi/foo/baq/', mode='w') as s3k:
+        s3k.write('')
+    with furi.open('s3://furi/foo/baq/bug', mode='w') as s3k:
+        s3k.write(value)
+    with furi.open('s3://furi/foo/bar/bizz/', mode='w') as s3k:
+        s3k.write('')
+    with furi.open('s3://furi/foo/bar/bizz/buzz', mode='w') as s3k:
+        s3k.write(value)
+    with furi.open('s3://furi/foo/bar/bizz/fizz', mode='w') as s3k:
+        s3k.write(value)
+    with furi.open('s3://furi/foo/ban', mode='w') as s3k:
+        s3k.write(value)
+
+    returned = list(furi.walk('s3://furi/foo/'))
+    expected = [
+        ('s3://furi/foo/',          ['baq', 'bar'],  ['ban']),
+        ('s3://furi/foo/baq/',      [],              ['bug']),
+        ('s3://furi/foo/bar/',      ['bizz'],        []),
+        ('s3://furi/foo/bar/bizz/', [],              ['buzz', 'fizz']) ]
+    assert_equal(returned, expected)

@@ -3,7 +3,7 @@
 
 __author__  = "amancevice"
 __email__   = "smallweirdnum@gmail.com"
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 
 import os
@@ -15,7 +15,8 @@ try:
 except ImportError:
     S3File = SftpFile = RemoteFile
 
-_DISPATCHER = {
+
+DISPATCHER = {
     ''     : File,
     'file' : File,
     's3'   : S3File,
@@ -28,16 +29,23 @@ def add_handler(scheme, handler_class):
         Arguments:
             scheme        (str):    URI scheme prefix
             handler_class (class):  Reference to class that extends furi.base """
-    _DISPATCHER[scheme] = handler_class
+    DISPATCHER[scheme] = handler_class
 
 
 def open(uri, **kwargs):
     """ Returns a File object given a URI. """
     uri = urlparse.urlparse(os.path.expanduser(uri))
     try:
-        return _DISPATCHER[uri.scheme](uri.geturl(), **kwargs)
+        return DISPATCHER[uri.scheme](uri.geturl(), **kwargs)
     except KeyError:
         raise ValueError("Unsupported URI scheme: '%s'" % uri.scheme)
+
+
+def walk(uri, **kwargs):
+    """ Walk a Directory given a URI. """
+    with open(uri, **kwargs) as walker:
+        assert walker.exists(), "Cannot walk; URI does not exist."
+        return walker.walk()
 
 
 def download(source, target=None, **credentials):

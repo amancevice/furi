@@ -73,7 +73,12 @@ class S3File(base.RemoteFile):
         except AttributeError:
             return self.key.set_contents_from_string(stream.read())
 
-    def walk(self, **kwargs):
+    def _stream_impl(self):
+        """ Implementation of stream(). """
+        return self.key
+
+    def _walk_impl(self, **kwargs):
+        """ Implementation of walk(). """
         root = str(re.sub('^/', '', self.key.name))
         tree = { root : { 'dirnames' : set(), 'filenames' : set() } }
         for key in self.bucket.list(root):
@@ -94,7 +99,3 @@ class S3File(base.RemoteFile):
             filenames = sorted(dirdata['filenames'])
             dirpath = "s3://%s/%s" % (self.bucket.name, dirpath)
             yield dirpath, dirnames, filenames
-
-    def _stream_impl(self):
-        """ Implementation of stream(). """
-        return self.key

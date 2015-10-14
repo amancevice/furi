@@ -84,6 +84,10 @@ class File(collections.Iterable):
 
     def walk(self, **kwargs):
         """ Walk the contents of a directory. """
+        return self._walk_impl(**kwargs)
+
+    def _walk_impl(self, **kwargs):
+        """ Implementation of walk(). """
         return os.walk(self.path, **kwargs)
 
     def _stream_impl(self):
@@ -100,7 +104,8 @@ class RemoteFile(File):
         try:
             return self._connection
         except AttributeError:
-            return self.connect()
+            self._connection = self.connect()
+            return self._connection
 
     def connect(self, **kwargs):
         """ Connect to remote. """
@@ -118,8 +123,8 @@ class RemoteFile(File):
         """ Write stream to file. """
         raise NotImplementedError
 
-    def walk(self, **kwargs):
-        """ Walk the contents of a directory. """
+    def _walk_impl(self, **kwargs):
+        """ Implementation of walk(). """
         raise NotImplementedError
 
     def _stream_impl(self):
