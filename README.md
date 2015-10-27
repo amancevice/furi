@@ -1,6 +1,6 @@
 # fURI
 
-<img src=https://travis-ci.org/amancevice/furi.svg?branch=master/>
+<img src="https://travis-ci.org/amancevice/furi.svg?branch=master"/>
 
 Interact with local &amp; remote files by URI
 
