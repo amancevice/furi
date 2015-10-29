@@ -1,5 +1,8 @@
 # furi Changelog
 
+0.2.2
+* Added walk() capabilities
+
 0.1.0
 * Added SSH private key support for SftpFile
 

@@ -3,7 +3,7 @@
 
 __author__  = "amancevice"
 __email__   = "smallweirdnum@gmail.com"
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 
 
 import os
@@ -44,7 +44,6 @@ def open(uri, **kwargs):
 def walk(uri, **kwargs):
     """ Walk a Directory given a URI. """
     with open(uri, **kwargs) as walker:
-        assert walker.exists(), "Cannot walk; URI does not exist."
         return walker.walk()
 
 

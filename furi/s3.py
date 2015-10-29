@@ -79,7 +79,7 @@ class S3File(base.RemoteFile):
 
     def _walk_impl(self, **kwargs):
         """ Implementation of walk(). """
-        root = str(re.sub('^/', '', self.key.name))
+        root = str(re.sub('^/', '', self.uri.path))
         tree = { root : { 'dirnames' : set(), 'filenames' : set() } }
         for key in self.bucket.list(root):
             rel, filename = map(str, os.path.split(re.split("^%s" % root, key.name)[-1]))
