@@ -32,3 +32,7 @@ def test_dispatch_sftp():
 @raises(ValueError)
 def test_bad_scheme():
     furi.open('foo://bar/path/test')
+
+
+def test_not_exists():
+    assert not furi.exists("/foo/bar")

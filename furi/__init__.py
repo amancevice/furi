@@ -3,7 +3,7 @@
 
 __author__  = "amancevice"
 __email__   = "smallweirdnum@gmail.com"
-__version__ = "0.2.2"
+__version__ = "0.2.3"
 
 
 import os
@@ -30,6 +30,12 @@ def add_handler(scheme, handler_class):
             scheme        (str):    URI scheme prefix
             handler_class (class):  Reference to class that extends furi.base """
     DISPATCHER[scheme] = handler_class
+
+
+def exists(uri, **kwargs):
+    """ Returns True if URI exists. """
+    with open(uri, **kwargs) as exister:
+        return exister.exists()
 
 
 def open(uri, **kwargs):

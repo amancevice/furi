@@ -1,5 +1,8 @@
 # furi Changelog
 
+0.2.3
+* Added furi.exists()
+
 0.2.2
 * Added walk() capabilities
 
