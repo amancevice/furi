@@ -1,5 +1,8 @@
 # furi Changelog
 
+0.3.0
+* Fixed setup.py
+
 0.2.3
 * Added furi.exists()
 

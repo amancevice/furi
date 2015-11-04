@@ -3,17 +3,14 @@
 
 __author__  = "amancevice"
 __email__   = "smallweirdnum@gmail.com"
-__version__ = "0.2.3"
+__version__ = "0.3.0"
 
 
 import os
 import urlparse
 from .base import File, RemoteFile
-try:
-    from .s3   import S3File
-    from .sftp import SftpFile
-except ImportError:
-    S3File = SftpFile = RemoteFile
+from .s3   import S3File
+from .sftp import SftpFile
 
 
 DISPATCHER = {
