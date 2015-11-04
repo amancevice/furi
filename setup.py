@@ -2,7 +2,7 @@ import os
 from setuptools import setup
 
 NAME    = "furi"
-VERSION = "0.3.0"
+VERSION = "0.3.1"
 AUTHOR  = "amancevice"
 EMAIL   = "smallweirdnum@gmail.com"
 DESC    = "fURI File access through URIs."
@@ -20,7 +20,8 @@ REQUIRES = [
     "nose",
     "mock",
     "moto",
-    "pysftp" ]
+    "paramiko==1.15.2",
+    "pysftp==0.2.8" ]
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
