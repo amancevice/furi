@@ -47,6 +47,10 @@ class S3File(base.RemoteFile):
             self.__connect__ = connectkw
         access_key  = self.__connect__.get('access_key')
         secret_key  = self.__connect__.get('secret_key')
+        if 'access_key' in self.__connect__:
+            del self.__connect__['access_key']
+        if 'secret_key' in self.__connect__:
+            del self.__connect__['secret_key']
         self._connection = boto.connect_s3(access_key, secret_key, **self.__connect__)
         return self._connection
 

@@ -2,7 +2,7 @@ import os
 from setuptools import setup
 
 NAME    = "furi"
-VERSION = "0.3.2"
+VERSION = "0.3.3"
 AUTHOR  = "amancevice"
 EMAIL   = "smallweirdnum@gmail.com"
 DESC    = "fURI File access through URIs."
