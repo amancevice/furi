@@ -98,6 +98,10 @@ class File(collections.Iterable):
 class RemoteFile(File):
     """ Remote file implentation. """
 
+    def __init__(self, uri, mode='r', **connectkw):
+        super(RemoteFile, self).__init__(uri, mode=mode)
+        self.__connect__ = connectkw
+
     @property
     def connection(self):
         """ Remote connection. """

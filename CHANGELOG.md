@@ -1,5 +1,8 @@
 # furi Changelog
 
+0.3.2
+* Added walk() implementation for SFTP
+
 0.3.0
 * Fixed setup.py
 
