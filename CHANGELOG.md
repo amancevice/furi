@@ -1,5 +1,8 @@
 # furi Changelog
 
+0.3.4
+* Bugfixes for SFTP.walk()
+
 0.3.2
 * Added walk() implementation for SFTP
 

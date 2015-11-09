@@ -2,6 +2,7 @@
 
 
 import io
+import os
 import pysftp
 import re
 import tempfile
@@ -61,7 +62,7 @@ class SftpFile(base.RemoteFile):
             wtcb = pysftp.WTCallbacks()
             self.connection.walktree(
                 dirpath, wtcb.file_cb, wtcb.dir_cb, wtcb.unk_cb, recurse=False)
-            yield dirpath, wtcb.dlist, wtcb.flist
+            yield dirpath, wtcb.dlist, map(lambda x: os.path.split(x)[-1], wtcb.flist)
             for dirname in wtcb.dlist:
                 for dirpath, dirnames, filenames in __walk_impl(dirname):
                     yield dirpath, dirnames, filenames
