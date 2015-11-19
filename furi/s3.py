@@ -33,7 +33,7 @@ class S3File(base.RemoteFile):
             self._key = self.bucket.get_key(self.uri.path)
             return self._key
 
-    def connect(self, **connectkw):
+    def connect(self, access_key=None, secret_key=None, **connectkw):
         """ Connect to remote. Uses environmental configuration by default, unless
             access/secret are supplied
 
@@ -45,13 +45,12 @@ class S3File(base.RemoteFile):
                 Boto connection object. """
         if connectkw:
             self.__connect__ = connectkw
-        access_key  = self.__connect__.get('access_key')
-        secret_key  = self.__connect__.get('secret_key')
-        if 'access_key' in self.__connect__:
-            del self.__connect__['access_key']
-        if 'secret_key' in self.__connect__:
-            del self.__connect__['secret_key']
-        self._connection = boto.connect_s3(access_key, secret_key, **self.__connect__)
+        self.__connect__['access_key'] = access_key or self.__connect__.get('access_key')
+        self.__connect__['secret_key'] = secret_key or self.__connect__.get('secret_key')
+        kwargs = { k : v for k,v in self.__connect__.iteritems() \
+            if k not in ('access_key', 'secret_key') }
+        self._connection = boto.connect_s3(
+            self.__connect__['access_key'], self.__connect__['secret_key'], **kwargs)
         return self._connection
 
     def download(self, target):

@@ -1,5 +1,8 @@
 # furi Changelog
 
+0.3.5
+* Bugfix for sending S3 keys as args instead of kwargs
+
 0.3.4
 * Bugfixes for SFTP.walk()
 
