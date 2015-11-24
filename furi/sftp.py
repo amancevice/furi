@@ -58,7 +58,7 @@ class SftpFile(base.RemoteFile):
 
     def _walk_impl(self):
         """ Implementation of walk(). """
-        def __walk_impl(dirpath="."):
+        def __walk_impl(dirpath):
             wtcb = pysftp.WTCallbacks()
             self.connection.walktree(
                 dirpath, wtcb.file_cb, wtcb.dir_cb, wtcb.unk_cb, recurse=False)
@@ -66,4 +66,4 @@ class SftpFile(base.RemoteFile):
             for dirname in wtcb.dlist:
                 for dirpath, dirnames, filenames in __walk_impl(dirname):
                     yield dirpath, dirnames, filenames
-        return __walk_impl(".")
+        return __walk_impl(".%s" % self.path)
