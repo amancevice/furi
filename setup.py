@@ -15,13 +15,15 @@ CLASSIFIERS = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 2.7",
     "Topic :: Utilities" ]
-REQUIRES = [
-    "boto3>=1.2.3",
-    "pysftp==0.2.8" ]
-TEST_REQUIRES = [
-    "nose",
-    "mock",
-    "moto" ]
+TEST_REQUIRES  = ["nose", "mock", "moto"]
+S3_REQUIRES    = ["boto3>=1.2.3"]
+SFTP_REQUIRES  = ["pysftp>=0.2.8"]
+EXTRAS_REQUIRE = {
+    'test' : TEST_REQUIRES,
+    's3'   : S3_REQUIRES,
+    'sftp' : SFTP_REQUIRES,
+    'all'  : S3_REQUIRES + SFTP_REQUIRES
+}
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
@@ -38,6 +40,7 @@ setup(
     description          = DESC,
     long_description     = read('README.md'),
     classifiers          = CLASSIFIERS,
-    install_requires     = REQUIRES,
+    install_requires     = EXTRAS_REQUIRE['all'],
     test_requires        = TEST_REQUIRES,
+    extras_require       = EXTRAS_REQUIRE,
     test_suite           = "nose.collector" )
