@@ -18,7 +18,7 @@ class SftpFile(base.RemoteFile):
         Ex. sftp://user:pass@host/path/to/file.ext """
 
     def connect(self, **connectkw):
-        """ Connect to remote. Uses credentials passed as part of URI. """
+        """ Connect to remote. Credentials can be passed as part of URI. """
         if connectkw:
             self.__connect__ = connectkw
 

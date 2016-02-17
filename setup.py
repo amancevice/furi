@@ -2,7 +2,7 @@ import os
 from setuptools import setup
 
 NAME    = "furi"
-VERSION = "0.3.6"
+VERSION = "0.4.0"
 AUTHOR  = "amancevice"
 EMAIL   = "smallweirdnum@gmail.com"
 DESC    = "fURI File access through URIs."
@@ -16,11 +16,12 @@ CLASSIFIERS = [
     "Programming Language :: Python :: 2.7",
     "Topic :: Utilities" ]
 REQUIRES = [
-    "boto>=2.38.0",
+    "boto3>=1.2.3",
+    "pysftp==0.2.8" ]
+TEST_REQUIRES = [
     "nose",
     "mock",
-    "moto",
-    "pysftp==0.2.8" ]
+    "moto" ]
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
@@ -38,4 +39,5 @@ setup(
     long_description     = read('README.md'),
     classifiers          = CLASSIFIERS,
     install_requires     = REQUIRES,
+    test_requires        = TEST_REQUIRES,
     test_suite           = "nose.collector" )

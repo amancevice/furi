@@ -1,9 +1,9 @@
 """ S3 File objects. """
 
-
-import boto
 import os
 import re
+import boto3
+import botocore
 from . import base
 
 
@@ -21,7 +21,7 @@ class S3File(base.RemoteFile):
         try:
             return self._bucket
         except AttributeError:
-            self._bucket = self.connection.get_bucket(self.uri.netloc)
+            self._bucket = self.connection.Bucket(self.uri.netloc)
             return self._bucket
 
     @property
@@ -30,57 +30,47 @@ class S3File(base.RemoteFile):
         try:
             return self._key
         except AttributeError:
-            self._key = self.bucket.get_key(self.uri.path)
+            self._key = self.connection.Object(self.uri.netloc, self.uri.path)
             return self._key
 
-    def connect(self, access_key=None, secret_key=None, **connectkw):
-        """ Connect to remote. Uses environmental configuration by default, unless
-            access/secret are supplied
-
-            Arguments:
-                access_key (str):  AWS access key
-                secret_key (str):  AWS secret key
-
-            Returns:
-                Boto connection object. """
+    def connect(self, **connectkw):
         if connectkw:
             self.__connect__ = connectkw
-        self.__connect__['access_key'] = access_key or self.__connect__.get('access_key')
-        self.__connect__['secret_key'] = secret_key or self.__connect__.get('secret_key')
-        kwargs = { k : v for k,v in self.__connect__.iteritems() \
-            if k not in ('access_key', 'secret_key') }
-        self._connection = boto.connect_s3(
-            self.__connect__['access_key'], self.__connect__['secret_key'], **kwargs)
+        self._connection = boto3.resource('s3', **self.__connect__)
         return self._connection
 
     def download(self, target):
         """ Download remote file to local target URI. """
-        self.key.get_contents_to_filename(str(target))
+        self.key.download_file(str(target))
         return target
 
     def exists(self):
         """ Test file existence. """
-        return self.key is not None
+        try:
+            self.key.load()
+        except botocore.exceptions.ClientError as err:
+            if err.response['Error']['Code'] == "404":
+                return False
+            raise err
+        return True
 
     def write(self, stream):
         """ Write stream to file. """
-        if not self.exists():
-            self._key = self.bucket.new_key(self.uri.path)
         try:
-            return self.key.set_contents_from_string(stream)
+            return self.key.put(Body=stream)
         except AttributeError:
-            return self.key.set_contents_from_string(stream.read())
+            return self.key.put(Body=stream.read())
 
     def _stream_impl(self):
         """ Implementation of stream(). """
-        return self.key
+        return self.key.get().get('Body')
 
     def _walk_impl(self, **kwargs):
         """ Implementation of walk(). """
         root = str(re.sub('^/', '', self.uri.path))
         tree = { root : { 'dirnames' : set(), 'filenames' : set() } }
-        for key in self.bucket.list(root):
-            rel, filename = map(str, os.path.split(re.split("^%s" % root, key.name)[-1]))
+        for key in self.bucket.objects.all():
+            rel, filename = map(str, os.path.split(re.split("^%s" % root, key.key)[-1]))
             history = root
             for subdir in rel.split('/'):
                 if subdir:

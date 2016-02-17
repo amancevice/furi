@@ -1,4 +1,4 @@
-import boto
+import boto3
 import furi
 import moto
 import tempfile
@@ -8,18 +8,18 @@ from nose.tools import assert_equal, assert_is_instance
 @moto.mock_s3
 def test_connect():
     s3furi = furi.open('s3://bucket/path/file')
-    returned = s3furi.connect()
-    expected = boto.s3.connection.S3Connection
-    assert_is_instance(returned, expected)
+    returned = repr(s3furi.connect())
+    expected = 's3.ServiceResource()'
+    assert_equal(returned, expected)
 
 
 @moto.mock_s3
 def test_download():
     value = "Hello, world!\n\nGoodby, cruel world."
-    ms3   = boto.connect_s3()
-    bkt   = ms3.create_bucket('furi')
-    key   = boto.s3.key.Key(bkt, 'foo/bar/bizz/buzz')
-    key.set_contents_from_string(value)
+    ms3   = boto3.resource('s3')
+    bkt   = ms3.create_bucket(Bucket='furi')
+    key   = bkt.Object('/foo/bar/bizz/buzz')
+    key.put(Body=value)
 
     with tempfile.NamedTemporaryFile() as tmp:
         furifile = furi.download('s3://furi/foo/bar/bizz/buzz', tmp.name)
@@ -28,29 +28,29 @@ def test_download():
 @moto.mock_s3
 def test_exists():
     value = "Hello, world!\n\nGoodby, cruel world."
-    ms3   = boto.connect_s3()
-    bkt   = ms3.create_bucket('furi')
-    key   = boto.s3.key.Key(bkt, 'foo/bar/bizz/buzz')
-    key.set_contents_from_string(value)
+    ms3   = boto3.resource('s3')
+    bkt   = ms3.create_bucket(Bucket='furi')
+    key   = bkt.Object('/foo/bar/bizz/buzz')
+    key.put(Body=value)
 
-    s3furi = furi.open('s3://furi/foo/bar/bizz/buzz')
-    assert s3furi.exists()
+    with furi.open('s3://furi/foo/bar/bizz/buzz') as s3furi:
+        assert s3furi.exists()
 
 
 @moto.mock_s3
 def test_not_exists():
-    ms3 = boto.connect_s3()
-    bkt = ms3.create_bucket('furi')
+    ms3 = boto3.resource('s3')
+    bkt = ms3.create_bucket(Bucket='furi')
 
-    s3furi = furi.open('s3://furi/foo/bar/bizz/buzz')
-    assert not s3furi.exists()
+    with furi.open('s3://furi/foo/bar/bizz/buzz') as s3furi:
+        assert not s3furi.exists()
 
 
 @moto.mock_s3
 def test_write():
     value = "Hello, world!\n\nGoodby, cruel world."
-    ms3   = boto.connect_s3()
-    bkt   = ms3.create_bucket('furi')
+    ms3   = boto3.resource('s3')
+    bkt   = ms3.create_bucket(Bucket='furi')
 
     s3furi = furi.open('s3://furi/foo/bar/bizz/buzz', mode='w')
     s3furi.write(value)
@@ -59,8 +59,8 @@ def test_write():
 @moto.mock_s3
 def test_write_stream():
     value = "Hello, world!\n\nGoodby, cruel world."
-    ms3   = boto.connect_s3()
-    bkt   = ms3.create_bucket('furi')
+    ms3   = boto3.resource('s3')
+    bkt   = ms3.create_bucket(Bucket='furi')
 
     s3furi1 = furi.open('s3://furi/foo/bar/bizz/buzz', mode='w')
     s3furi1.write(value)
@@ -72,8 +72,8 @@ def test_write_stream():
 @moto.mock_s3
 def test_walk():
     value = "Hello, world!\n\nGoodby, cruel world."
-    ms3   = boto.connect_s3()
-    bkt   = ms3.create_bucket('furi')
+    ms3   = boto3.resource('s3')
+    bkt   = ms3.create_bucket(Bucket='furi')
 
     with furi.open('s3://furi/foo/', mode='w') as s3k:
         s3k.write('')
