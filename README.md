@@ -4,13 +4,17 @@
 
 Interact with local &amp; remote files by URI
 
-Last updated: `0.2.1`
+Last updated: `0.4.0`
 
 
 ## Installation
 
 ```
-pip install furi
+pip install furi # Installs S3 and SFTP support by default
+
+pip intsall furi[s3] # Installs S3 support only
+
+pip install furi[sftp] # Installs SFTP support only
 ```
 
 
@@ -44,9 +48,10 @@ for dirpath, dirnames, filenames in furi.walk('s3://bucket/path/to/key/'):
     print filenames
 
 # Walk S3 with supplied credentials
-walkgen = furi.walk('s3://bucket/path/to/key/',
-    access_key='ACCESS', secret_key='SECRET')
-for dirpath, dirnames, filenames in walkgen:
+credentials = {
+    'aws_access_key_id'     : '<access_key>',
+    'aws_secret_access_key' : '<secret_key>' }
+for dirpath, dirnames, filenames in furi.walk('s3://bucket/path/to/key/', **credentials):
     print dirpath
     print dirnames
     print filenames
@@ -55,7 +60,7 @@ for dirpath, dirnames, filenames in walkgen:
 
 ## S3-backed files
 
-Connect to S3 by supplying `access_key` & `secret_key`, or by creating the file `~/.boto` with contents:
+Connect to S3 by supplying `aws_access_key_id` & `aws_secret_access_key`, or by creating the file `~/.boto` with contents:
 
 ```bash
 # ~/.boto
@@ -72,7 +77,7 @@ s3file = furi.open('s3://bucket/path/to/key')
 
 # Supply credentials
 s3file = furi.open('s3://bucket/path/to/key', 
-    access_key='ACCESS', secret_key='SECRET' )
+    aws_access_key_id='ACCESS', aws_secret_access_key='SECRET' )
 ```
 
 
