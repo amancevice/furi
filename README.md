@@ -4,7 +4,7 @@
 
 Interact with local &amp; remote files by URI
 
-Last updated: `0.4.0`
+Last updated: `0.4.1`
 
 
 ## Installation
