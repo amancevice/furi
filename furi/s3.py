@@ -30,7 +30,8 @@ class S3File(base.RemoteFile):
         try:
             return self._key
         except AttributeError:
-            self._key = self.connection.Object(self.uri.netloc, self.uri.path)
+            self._key = self.connection.Object(
+                self.uri.netloc, self.uri.path.lstrip('/'))
             return self._key
 
     def connect(self, **connectkw):

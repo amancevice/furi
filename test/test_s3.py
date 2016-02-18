@@ -18,7 +18,7 @@ def test_download():
     value = "Hello, world!\n\nGoodby, cruel world."
     ms3   = boto3.resource('s3')
     bkt   = ms3.create_bucket(Bucket='furi')
-    key   = bkt.Object('/foo/bar/bizz/buzz')
+    key   = bkt.Object('foo/bar/bizz/buzz')
     key.put(Body=value)
 
     with tempfile.NamedTemporaryFile() as tmp:
@@ -30,7 +30,7 @@ def test_exists():
     value = "Hello, world!\n\nGoodby, cruel world."
     ms3   = boto3.resource('s3')
     bkt   = ms3.create_bucket(Bucket='furi')
-    key   = bkt.Object('/foo/bar/bizz/buzz')
+    key   = bkt.Object('foo/bar/bizz/buzz')
     key.put(Body=value)
 
     with furi.open('s3://furi/foo/bar/bizz/buzz') as s3furi:
