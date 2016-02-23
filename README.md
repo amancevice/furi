@@ -4,17 +4,13 @@
 
 Interact with local &amp; remote files by URI
 
-Last updated: `0.4.1`
+Last updated: `0.5.0`
 
 
 ## Installation
 
 ```
-pip install furi # Installs S3 and SFTP support by default
-
-pip intsall furi[s3] # Installs S3 support only
-
-pip install furi[sftp] # Installs SFTP support only
+pip install furi
 ```
 
 
@@ -101,4 +97,58 @@ with furi.open('<uri>', mode='<mode>') as furifile:
     furifile.stream()                  # Get handle to file contents stream
     furifile.write('str or stream')    # Write a string or stream to file
     furifile.connect(**credentials)    # Connect to a remote file service (such as S3)
+```
+
+
+## Configurations/Mappings
+
+Structured JSON or YAML files can be loaded into a mapping object using the `furi.map()` function.
+
+### Local & S3 File Mapping
+
+Mapping local or S3-backed file contents operations are not cached so every read has some cost to it. If numerous reads are expected it is recommended that the object is mapped into a dictionary. File-based mapping objects do not support write operations at this time.
+
+```python
+mymap = furi.map('s3://buket/path/to/mapping.json')
+mymap = furi.map('/path/to/local/mapping.yaml')
+
+print mymap['key']
+# => "Hello, world!"
+
+print mymap['otherkey'] # Reads file from S3 again
+# => "Goodby, cruel world!"
+
+# Reads the file once and caches it in `mymap`
+mymap = dict(furi.map('s3://buket/path/to/mapping.json')) 
+```
+
+
+### DynamoDB Mapping
+
+Single partition-key DynamoDB tables without sort-keys are also supported and use the URI format `"dynamodb://<tablename>/"`. The returned mapping object can be queried like a dictionary.
+
+```python
+mynamo = furi.mapping('dynamodb://mytable/', region_name='us-east-1')
+
+print mynamo['partition_key_value']
+# => { "partition_key_name" : "partition_key_value",
+#      "field1": "Hello, world!",
+#      "field2": "Goodbye, cruel world!" }
+```
+
+
+## Chained Mappings
+
+It may be the case that you have a prioritized list of mapping files, where if a key cannot be found in the first map, the second is queried, then the third, and so on until a match is found or a `KeyError` is thrown. Use the `furi.chain()` function to chain mappings together.
+
+```python
+chains = 's3://bucket/path/to/map.yml', '/path/to/local.json'
+chainmap = furi.chain(*map(furi.map, chains))
+
+print chainmap['key']
+# => "Hello, world!"
+
+print chainmap['otherkey']
+# => WARNING:root:s3://bucket/path/to/map.yml :: KeyError('otherkey',)
+#    "Goodby, cruel world!"
 ```
