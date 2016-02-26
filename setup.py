@@ -15,7 +15,7 @@ CLASSIFIERS = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 2.7",
     "Topic :: Utilities" ]
-TEST_REQUIRES = ["nose", "mock", "moto"]
+TEST_REQUIRES = ["boto", "nose", "mock", "moto"]
 REQUIRES = [
     "PyYAML>=3.11.0",
     "boto3>=1.2.3",
