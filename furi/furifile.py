@@ -219,7 +219,6 @@ class S3File(RemoteFile):
             yield dirpath, dirnames, filenames
 
 
-
 class SftpFile(RemoteFile):
     """ File on SFTP server.
 

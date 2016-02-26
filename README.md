@@ -32,6 +32,10 @@ with furi.open('s3://bucket/path/to/key') as s3:
 with furi.open('sftp://user:pass@host/path/to/file.ext') as sftp:
     print sftp.read()
     # => Hello from SFTP
+
+with furi.open('file:///path/to/local/file.ext') as local:
+    print local.read()
+    # => Hello from Local file system
 ```
 
 #### Walking Directories
