@@ -2,6 +2,8 @@ __author__ = 'amancevice'
 
 
 import furi
+import furi.aws
+import furi.sftp
 from nose.tools import assert_equal, raises
 
 
@@ -19,13 +21,13 @@ def test_dispatch_local_with_scheme():
 
 def test_dispatch_s3():
     returned = type(furi.open('s3://bucket/path/to/test'))
-    expected = furi.furifile.S3File
+    expected = furi.aws.S3File
     assert_equal(returned, expected)
 
 
 def test_dispatch_sftp():
     returned = type(furi.open('sftp://user:pass@host/path/test'))
-    expected = furi.furifile.SftpFile
+    expected = furi.sftp.SftpFile
     assert_equal(returned, expected)
 
 

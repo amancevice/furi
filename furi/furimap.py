@@ -5,58 +5,7 @@ import json
 import logging
 import os
 import yaml
-from urlparse import urlparse
-import boto3
 from . import utils
-
-
-class DynamoMap(collections.Iterable):
-    """ DynamoDB-backed mappings. """
-    def __init__(self, uri, **connectkw):
-        self.uri = urlparse(uri)
-        self.connection = boto3.resource('dynamodb', **connectkw)
-        self.table = self.connection.Table(self.uri.netloc)
-
-    def __str__(self):
-        return self.uri.geturl()
-
-    def __getitem__(self, key):
-        try:
-            ikey = { self.table.key_schema[0]['AttributeName'] : key }
-            return self.__read(self.table.get_item(Key=ikey))['Item']
-        except KeyError:
-            raise KeyError(key)
-
-    def __iter__(self):
-        response = self.table.scan()
-        items = response.get('Items') or []
-        for item in items:
-            yield item
-        while 'LastEvaluatedKey' in response:
-            response = self.table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
-            items = response.get('Items') or []
-            for item in items:
-                yield item
-
-    def __len__(self):
-        return self.table.item_count
-
-    def __setitem__(self, key, value):
-        origin = self[key].get('Item', key).items()
-        update = value.items()
-        return self.table.put_item(Item=dict(origin + update))
-
-    def __delitem__(self, key):
-        self.table.delete_item(Key=key)
-
-    def __read(self, results=None):
-        """ Read Dynamo result and throw ValueError on non-200 response code. """
-        results = results or self.table.scan()
-        response = results.get('ResponseMetadata') or {}
-        httpcode = response.get('HTTPStatusCode')
-        if httpcode != 200:
-            raise ValueError(response)
-        return results
 
 
 class FileMap(collections.Mapping):
@@ -71,6 +20,9 @@ class FileMap(collections.Mapping):
 
     def __str__(self):
         return str(self.source)
+
+    def __repr__(self):
+        return "<%sMap: %s>" % (type(self.source).__name__, self.source)
 
     def __getitem__(self, key):
         try:
@@ -135,17 +87,6 @@ def chain(*mappings):
     return ChainedMap(*mappings)
 
 
-def map(uri, **kwargs):
-    """ Return a Mapping object from a URI. """
-    uri = urlparse(os.path.expanduser(uri))
-    try:
-        return _DISPATCHER[uri.scheme](uri.geturl(), **kwargs)
-    except KeyError:
-        raise ValueError("Unsupported URI scheme: '%s'" % uri.scheme)
-
-
-_DISPATCHER = {
-    ''         : FileMap,
-    'file'     : FileMap,
-    's3'       : FileMap,
-    'dynamodb' : DynamoMap }
+utils.add_handler('' , FileMap, 'map')
+utils.add_handler('file', FileMap, 'map')
+utils.add_handler('s3', FileMap, 'map')

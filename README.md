@@ -4,13 +4,17 @@
 
 Interact with local &amp; remote files by URI
 
-Last updated: `0.5.0`
+Last updated: `0.6.0`
 
 
 ## Installation
 
 ```
-pip install furi
+pip install furi # Installs AWS and SFTP support by default
+
+pip intsall furi[aws] # Installs AWS support only (S3, DynamoDB)
+
+pip install furi[sftp] # Installs SFTP support only
 ```
 
 
@@ -25,17 +29,30 @@ with furi.open('/path/to/some/file.ext') as local:
     print local.read()
     # => Hello, world!
 
+with furi.open('file:///path/to/local/file.ext') as local:
+    print local.read()
+    # => Hello from Local file system
+```
+
+Import `furi.aws` to access Amazon services through `boto3`.
+
+```python
+import furi.aws
+
 with furi.open('s3://bucket/path/to/key') as s3:
     print s3.read()
     # => Hello from S3!
+```
+
+Import `furi.sftp` to access a file through SFTP.
+
+```python
+import furi.sftp
 
 with furi.open('sftp://user:pass@host/path/to/file.ext') as sftp:
     print sftp.read()
     # => Hello from SFTP
 
-with furi.open('file:///path/to/local/file.ext') as local:
-    print local.read()
-    # => Hello from Local file system
 ```
 
 #### Walking Directories
@@ -60,19 +77,10 @@ for dirpath, dirnames, filenames in furi.walk('s3://bucket/path/to/key/', **cred
 
 ## S3-backed files
 
-Connect to S3 by supplying `aws_access_key_id` & `aws_secret_access_key`, or by creating the file `~/.boto` with contents:
-
-```bash
-# ~/.boto
-[Credentials]
-aws_access_key_id = ACCESS_KEY_HERE
-aws_secret_access_key = SECRET_KEY_HERE
-```
-
 Example S3-file access:
 
 ```python
-# Use ~/.boto or ENV variables to authenticate
+# Using ~/.boto or ENV variables to authenticate
 s3file = furi.open('s3://bucket/path/to/key')
 
 # Supply credentials
@@ -107,6 +115,7 @@ with furi.open('<uri>', mode='<mode>') as furifile:
 ## Configurations/Mappings
 
 Structured JSON or YAML files can be loaded into a mapping object using the `furi.map()` function.
+
 
 ### Local & S3 File Mapping
 
