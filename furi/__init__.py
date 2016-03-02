@@ -7,6 +7,7 @@ __version__ = "0.5.0"
 
 
 from .furimap import chain
+from .utils import add_handler
 from .utils import download
 from .utils import exists
 from .utils import map

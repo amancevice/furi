@@ -1,5 +1,15 @@
 # furi Changelog
 
+0.6.1
+* Re-added `add_handler` as first-level method
+
+0.6.0
+* Separated dependencies into extras_require. Import AWS support with `import furi.aws`. Import SFTP support with `import furi.sftp`
+
+0.5.0
+* Added support for mapping JSON and YAML files with furi.map()
+* Added support to map single-key DynamoDB instance with furi.map()
+
 0.3.6
 * Bugfix for walking SFTP
 

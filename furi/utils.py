@@ -12,10 +12,7 @@ def add_handler(scheme, handler_class, handler_type='file'):
         Arguments:
             scheme        (str):    URI scheme prefix
             handler_class (class):  Reference to class that extends furi.base """
-    if handler_type == 'file':
-        _FILE_DISPATCHER[scheme] = handler_class
-    elif handler_type == 'map':
-        _MAP_DISPATCHER[scheme] = handler_class
+    __dispatch__[handler_type][scheme] = handler_class
 
 
 def exists(uri, **kwargs):
@@ -28,7 +25,7 @@ def map(uri, **kwargs):
     """ Return a Mapping object from a URI. """
     uri = urlparse(os.path.expanduser(uri))
     try:
-        return _MAP_DISPATCHER[uri.scheme](uri.geturl(), **kwargs)
+        return __dispatch__['map'][uri.scheme](uri.geturl(), **kwargs)
     except KeyError:
         raise ValueError("Unsupported URI scheme: '%s'" % uri.scheme)
 
@@ -37,7 +34,7 @@ def open(uri, **kwargs):
     """ Returns a File object given a URI. """
     uri = urlparse(os.path.expanduser(uri))
     try:
-        return _FILE_DISPATCHER[uri.scheme](uri.geturl(), **kwargs)
+        return __dispatch__['file'][uri.scheme](uri.geturl(), **kwargs)
     except KeyError:
         raise ValueError("Unsupported URI scheme: '%s'" % uri.scheme)
 
@@ -71,9 +68,6 @@ def download(source, target=None, **credentials):
     return src.download(tgt)
 
 
-_FILE_DISPATCHER = {
-    ''     : furifile.File,
-    'file' : furifile.File }
-
-
-_MAP_DISPATCHER = {}
+__dispatch__ = {
+    'map'  : {},
+    'file' : {'': furifile.File, 'file': furifile.File}}
