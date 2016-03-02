@@ -1,5 +1,8 @@
 # furi Changelog
 
+0.6.3
+* Better setup.py
+
 0.6.2
 * Bugfix to S3 walk() implementation
 

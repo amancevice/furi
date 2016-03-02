@@ -1,8 +1,8 @@
 import os
+import re
 from setuptools import setup
 
 NAME    = "furi"
-VERSION = "0.6.2"
 AUTHOR  = "amancevice"
 EMAIL   = "smallweirdnum@gmail.com"
 DESC    = "fURI File access through URIs."
@@ -28,9 +28,14 @@ EXTRAS_REQUIRE = {
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
+def version():
+    search = r"^__version__ *= *['\"]([0-9.]+)['\"]"
+    initpy = read('./furi/__init__.py')
+    return re.search(search, initpy, re.MULTILINE).group(1)
+
 setup(
     name                 = NAME,
-    version              = VERSION,
+    version              = version(),
     author               = AUTHOR,
     author_email         = EMAIL,
     packages             = [ NAME ],
