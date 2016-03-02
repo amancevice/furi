@@ -1,5 +1,8 @@
 # furi Changelog
 
+0.6.2
+* Bugfix to S3 walk() implementation
+
 0.6.1
 * Re-added `add_handler` as first-level method
 

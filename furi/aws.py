@@ -70,7 +70,7 @@ class S3File(furifile.RemoteFile):
         """ Implementation of walk(). """
         root = str(re.sub('^/', '', self.uri.path))
         tree = { root : { 'dirnames' : set(), 'filenames' : set() } }
-        for key in self.bucket.objects.all():
+        for key in self.bucket.objects.filter(Prefix=self.key.key):
             rel, filename = map(str, os.path.split(re.split("^%s" % root, key.key)[-1]))
             history = root
             for subdir in rel.split('/'):
