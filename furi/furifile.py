@@ -38,11 +38,12 @@ class File(collections.Iterable):
         return self
 
     def __exit__(self, type, value, traceback):
-        pass
+        self.close()
 
     def close(self):
         """ Close stream. """
-        return self.stream().close()
+        if self.exists():
+            return self.stream().close()
 
     def matches(self, pattern):
         """ Filename matches pattern.
@@ -64,6 +65,8 @@ class File(collections.Iterable):
 
     def write(self, stream):
         """ Write stream to file. """
+        if not self.exists() and ('w' in self.mode or 'a' in self.mode):
+            os.makedirs(self.workdir)
         try:
             return self.stream().write(stream)
         except TypeError:

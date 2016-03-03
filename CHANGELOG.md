@@ -1,5 +1,8 @@
 # furi Changelog
 
+0.6.5
+* make dirs for non-existent file on write/append mode
+
 0.6.4
 * Added backward-compat support for boto-style keyword args
 * Try to import AWS and SFTP support by default
