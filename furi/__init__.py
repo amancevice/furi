@@ -3,7 +3,7 @@
 
 __author__  = "amancevice"
 __email__   = "smallweirdnum@gmail.com"
-__version__ = "0.6.3"
+__version__ = "0.6.4"
 
 
 from .furimap import chain
@@ -13,3 +13,13 @@ from .utils import exists
 from .utils import map
 from .utils import open
 from .utils import walk
+
+try:
+    from . import aws
+except ImportError:
+    pass
+
+try:
+    from . import sftp
+except ImportError:
+    pass

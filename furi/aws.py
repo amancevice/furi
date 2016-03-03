@@ -37,6 +37,16 @@ class S3File(furifile.RemoteFile):
     def connect(self, **connectkw):
         if connectkw:
             self.__connect__ = connectkw
+
+        # Support boto-style access/secret keys
+        if 'access_key' in self.__connect__:
+            self.__connect__['aws_access_key_id'] = self.__connect__['access_key']
+            del self.__connect__['access_key']
+        if 'secret_key' in self.__connect__:
+            self.__connect__['aws_secret_access_key'] = self.__connect__['secret_key']
+            del self.__connect__['secret_key']
+
+        # Connect to AWS
         self._connection = boto3.resource('s3', **self.__connect__)
         return self._connection
 

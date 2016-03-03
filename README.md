@@ -10,11 +10,13 @@ Last updated: `0.6.0`
 ## Installation
 
 ```
-pip install furi # Installs AWS and SFTP support by default
+pip install furi # Install basic support
 
-pip intsall furi[aws] # Installs AWS support only (S3, DynamoDB)
+pip install furi[all] # Install AWS & SFTP dependencies
 
-pip install furi[sftp] # Installs SFTP support only
+pip intsall furi[aws] # Install AWS dependencies
+
+pip install furi[sftp] # Install SFTP dependencies
 ```
 
 
@@ -34,21 +36,17 @@ with furi.open('file:///path/to/local/file.ext') as local:
     # => Hello from Local file system
 ```
 
-Import `furi.aws` to access Amazon services through `boto3`.
+If `furi` was installed with AWS dependencies S3 files can be read as well:
 
 ```python
-import furi.aws
-
 with furi.open('s3://bucket/path/to/key') as s3:
     print s3.read()
     # => Hello from S3!
 ```
 
-Import `furi.sftp` to access a file through SFTP.
+Same for SFTP files:
 
 ```python
-import furi.sftp
-
 with furi.open('sftp://user:pass@host/path/to/file.ext') as sftp:
     print sftp.read()
     # => Hello from SFTP

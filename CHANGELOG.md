@@ -1,5 +1,9 @@
 # furi Changelog
 
+0.6.4
+* Added backward-compat support for boto-style keyword args
+* Try to import AWS and SFTP support by default
+
 0.6.3
 * Better setup.py
 

@@ -30,7 +30,7 @@ def read(fname):
 
 def version():
     search = r"^__version__ *= *['\"]([0-9.]+)['\"]"
-    initpy = read('./furi/__init__.py')
+    initpy = read("./%s/__init__.py" % NAME)
     return re.search(search, initpy, re.MULTILINE).group(1)
 
 setup(
