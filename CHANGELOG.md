@@ -1,5 +1,8 @@
 # furi Changelog
 
+0.6.6
+* Allow directories to already exists when we attempt to mak dirs
+
 0.6.5
 * make dirs for non-existent file on write/append mode
 
