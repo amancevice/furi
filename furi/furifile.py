@@ -66,7 +66,11 @@ class File(collections.Iterable):
     def write(self, stream):
         """ Write stream to file. """
         if not self.exists() and ('w' in self.mode or 'a' in self.mode):
-            os.makedirs(self.workdir)
+            try:
+                os.makedirs(self.workdir)
+            except OSError as err:
+                if err.errno != 17:
+                    raise
         try:
             return self.stream().write(stream)
         except TypeError:
