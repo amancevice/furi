@@ -3,7 +3,7 @@
 
 __author__  = "amancevice"
 __email__   = "smallweirdnum@gmail.com"
-__version__ = "0.6.6"
+__version__ = "0.6.7"
 
 
 from .furimap import chain

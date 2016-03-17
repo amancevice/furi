@@ -1,5 +1,8 @@
 # furi Changelog
 
+0.6.7
+* Bugfix for SFTP files to chdir before attempting to get
+
 0.6.6
 * Allow directories to already exists when we attempt to mak dirs
 

@@ -49,7 +49,7 @@ class SftpFile(furifile.RemoteFile):
     def _stream_impl(self):
         """ Implementation of stream(). """
         with tempfile.NamedTemporaryFile() as tmp:
-            self.connection.get(self.filename, tmp.name)
+            self.connection.get(self.path, tmp.name)
             tmp.flush()
             return io.StringIO(unicode(tmp.read()))
 
