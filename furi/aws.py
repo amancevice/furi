@@ -3,13 +3,14 @@
 import collections
 import os
 import re
+from urlparse import urlparse
 import boto3
 import botocore
-from urlparse import urlparse
 from . import furifile
 from . import utils
 
 
+# pylint: disable=too-few-public-methods
 class S3File(furifile.RemoteFile):
     """ S3-backed file implementation.
 
@@ -18,26 +19,14 @@ class S3File(furifile.RemoteFile):
     @property
     def bucket(self):
         """ Remote bucket. """
-        try:
-            return self._bucket
-        except AttributeError:
-            self._bucket = self.connection.Bucket(self.uri.netloc)
-            return self._bucket
+        return self.connection.Bucket(self.uri.netloc)
 
     @property
     def key(self):
         """ Remote key. """
-        try:
-            return self._key
-        except AttributeError:
-            self._key = self.connection.Object(
-                self.uri.netloc, self.uri.path.lstrip('/'))
-            return self._key
+        return self.connection.Object(self.uri.netloc, self.uri.path.lstrip('/'))
 
-    def connect(self, **connectkw):
-        if connectkw:
-            self.__connect__ = connectkw
-
+    def _connect(self):
         # Support boto-style access/secret keys
         if 'access_key' in self.__connect__:
             self.__connect__['aws_access_key_id'] = self.__connect__['access_key']
@@ -47,15 +36,14 @@ class S3File(furifile.RemoteFile):
             del self.__connect__['secret_key']
 
         # Connect to AWS
-        self._connection = boto3.resource('s3', **self.__connect__)
-        return self._connection
+        return boto3.resource('s3', **self.__connect__)
 
-    def download(self, target):
+    def _download(self, target):
         """ Download remote file to local target URI. """
         self.key.download_file(str(target))
         return target
 
-    def exists(self):
+    def _exists(self):
         """ Test file existence. """
         try:
             self.key.load()
@@ -65,36 +53,36 @@ class S3File(furifile.RemoteFile):
             raise err
         return True
 
-    def write(self, stream):
+    def _write(self, stream):
         """ Write stream to file. """
         try:
-            return self.key.put(Body=stream)
-        except AttributeError:
             return self.key.put(Body=stream.read())
+        except AttributeError:
+            return self.key.put(Body=stream)
 
-    def _stream_impl(self):
+    def _stream(self):
         """ Implementation of stream(). """
         return self.key.get().get('Body')
 
-    def _walk_impl(self, **kwargs):
+    def _walk(self, **kwargs):
         """ Implementation of walk(). """
         root = str(re.sub('^/', '', self.uri.path))
-        tree = { root : { 'dirnames' : set(), 'filenames' : set() } }
+        tree = {root : {'dirnames': set(), 'filenames' : set()}}
         for key in self.bucket.objects.filter(Prefix=self.key.key):
-            rel, filename = map(str, os.path.split(re.split("^%s" % root, key.key)[-1]))
+            rel, filename = [str(x) for x in os.path.split(re.split("^%s" % root, key.key)[-1])]
             history = root
             for subdir in rel.split('/'):
                 if subdir:
                     tree[history]['dirnames'].add(subdir)
                 history = os.path.normpath(os.path.join(history, subdir)) + '/'
                 if history not in tree:
-                    tree[history] = { 'dirnames' : set(), 'filenames' : set() }
+                    tree[history] = {'dirnames': set(), 'filenames': set()}
             if filename:
                 tree[history]['filenames'].add(filename)
 
         for dirpath in sorted(tree.keys()):
-            dirdata   = tree[dirpath]
-            dirnames  = sorted(dirdata['dirnames'])
+            dirdata = tree[dirpath]
+            dirnames = sorted(dirdata['dirnames'])
             filenames = sorted(dirdata['filenames'])
             dirpath = "s3://%s/%s" % (self.bucket.name, dirpath)
             yield dirpath, dirnames, filenames
@@ -115,8 +103,8 @@ class DynamoMap(collections.Iterable):
 
     def __getitem__(self, key):
         try:
-            ikey = { self.table.key_schema[0]['AttributeName'] : key }
-            return self.__read(self.table.get_item(Key=ikey))['Item']
+            ikey = {self.table.key_schema[0]['AttributeName']: key}
+            return self._read(self.table.get_item(Key=ikey))['Item']
         except KeyError:
             raise KeyError(key)
 
@@ -142,7 +130,7 @@ class DynamoMap(collections.Iterable):
     def __delitem__(self, key):
         self.table.delete_item(Key=key)
 
-    def __read(self, results=None):
+    def _read(self, results=None):
         """ Read Dynamo result and throw ValueError on non-200 response code. """
         results = results or self.table.scan()
         response = results.get('ResponseMetadata') or {}
@@ -152,5 +140,5 @@ class DynamoMap(collections.Iterable):
         return results
 
 
-utils.add_handler('s3', S3File, 'file')
-utils.add_handler('dynamodb', DynamoMap, 'map')
+utils.add_handler('s3', S3File)
+utils.add_mapper('dynamodb', DynamoMap)

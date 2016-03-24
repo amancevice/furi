@@ -1,19 +1,39 @@
 """ fURI utilities """
 
 
+import json
 import os
 from urlparse import urlparse
+import yaml
 from . import furifile
 from . import exceptions
 
 
-def add_handler(scheme, handler_class, handler_type='file'):
+def add_handler(scheme, cls):
     """ Add a new class to the dispatcher
 
         Arguments:
-            scheme        (str):    URI scheme prefix
-            handler_class (class):  Reference to class that extends furi.base """
-    __dispatch__[handler_type][scheme] = handler_class
+            scheme (str):    URI scheme prefix
+            cls    (class):  Reference to class that extends furi.base """
+    __dispatch__[scheme] = cls
+
+
+def add_mapper(scheme, cls):
+    """ Add a new class to the dispatcher
+
+        Arguments:
+            scheme (str):    URI scheme prefix
+            cls    (class):  Reference to class that extends furi.base """
+    __mapdispatch__[scheme] = cls
+
+
+def add_mapext(ext, func):
+    """ Add an extension handler for FileMap.
+
+        Arguments:
+            ext  (str):   File extension
+            func (func):  Function to parse FileMap """
+    __extdispatch__[ext] = func
 
 
 def exists(uri, **kwargs):
@@ -22,20 +42,20 @@ def exists(uri, **kwargs):
         return exister.exists()
 
 
-def map(uri, **kwargs):
+def map(uri, **kwargs): # pylint: disable=redefined-builtin
     """ Return a Mapping object from a URI. """
     uri = urlparse(os.path.expanduser(uri))
     try:
-        return __dispatch__['map'][uri.scheme](uri.geturl(), **kwargs)
+        return __mapdispatch__[uri.scheme](uri.geturl(), **kwargs)
     except KeyError:
         raise exceptions.SchemeError("Unsupported URI scheme: '%s'" % uri.scheme)
 
 
-def open(uri, **kwargs):
+def open(uri, **kwargs): # pylint: disable=redefined-builtin
     """ Returns a File object given a URI. """
     uri = urlparse(os.path.expanduser(uri))
     try:
-        return __dispatch__['file'][uri.scheme](uri.geturl(), **kwargs)
+        return __dispatch__[uri.scheme](uri.geturl(), **kwargs)
     except KeyError:
         raise exceptions.SchemeError("Unsupported URI scheme: '%s'" % uri.scheme)
 
@@ -71,5 +91,16 @@ def download(source, target=None, **credentials):
 
 
 __dispatch__ = {
-    'map'  : {},
-    'file' : {'': furifile.File, 'file': furifile.File}}
+    '': furifile.File,
+    'file': furifile.File
+}
+
+
+__mapdispatch__ = {}
+
+
+__extdispatch__ = {
+    '.json' : json.loads,
+    '.yaml' : yaml.load,
+    '.yml'  : yaml.load
+}

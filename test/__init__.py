@@ -1,6 +1,3 @@
-__author__ = 'amancevice'
-
-
 import furi
 from nose.tools import assert_equal, raises
 

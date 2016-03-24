@@ -7,25 +7,23 @@ from urlparse import urlparse
 from . import exceptions
 
 
-MODES = 'r', 'rb', 'r+', 'rb+', 'w', 'wb', 'w+', 'wb+', 'a', 'ab', 'a+', 'ab+'
-
-
 class File(collections.Iterable):
-    """ Local File implentation.
+    """ Local File implementation.
 
         Exs. file:///abs/path/to/file.ext
              /abs/path/to/file.ext """
 
-    modes = set(MODES)
+    __modes__ = {'r', 'rb', 'r+', 'rb+', 'w', 'wb', 'w+', 'wb+', 'a', 'ab', 'a+', 'ab+'}
 
     def __init__(self, uri, mode='r'):
-        if mode not in self.modes and not set(mode).issubset(self.modes):
+        if mode not in self.__modes__ and not set(mode).issubset(self.__modes__):
             raise exceptions.ModeError(
                 "Cannot open %s in %s-mode" % (type(self).__name__, mode))
-        self.uri  = urlparse(uri)
+        self.uri = urlparse(uri)
         self.path = self.uri.path
         self.mode = mode
         self.workdir, self.filename = os.path.split(self.path)
+        self.__stream__ = None
 
     def __str__(self):
         return self.uri.geturl()
@@ -34,18 +32,21 @@ class File(collections.Iterable):
         return "<%s: %s>" % (type(self).__name__, str(self))
 
     def __iter__(self):
-        return self.stream()
+        return iter(self.stream())
 
     def __enter__(self):
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, *args):
         self.close()
 
     def close(self):
         """ Close stream. """
-        if self.exists():
-            return self.stream().close()
+        return self._close()
+
+    def exists(self):
+        """ Test file existence. """
+        return self._exists()
 
     def matches(self, pattern):
         """ Filename matches pattern.
@@ -57,83 +58,103 @@ class File(collections.Iterable):
                 RegEx match object. """
         return re.compile(pattern).match(self.filename)
 
-    def exists(self):
-        """ Test file existence. """
-        return os.path.exists(self.path)
-
     def read(self, *size):
         """ Read file stream. """
-        return self.stream().read(*size)
-
-    def write(self, stream):
-        """ Write stream to file. """
-        if not os.path.exists(self.workdir) and ('w' in self.mode or 'a' in self.mode):
-            os.makedirs(self.workdir)
-        try:
-            return self.stream().write(stream)
-        except TypeError:
-            return self.stream().write(stream.read())
+        return self._read(*size)
 
     def stream(self):
         """ Get file contents as stream. """
-        try:
-            self._stream.seek(0)
-            return self._stream
-        except AttributeError:
+        if self.__stream__ is not None:
+            self.__stream__.seek(0)
+        else:
             if not self.exists() and 'w' not in self.mode:
-                raise ValueError("%s does not exist" % self.uri.geturl())
-            self._stream = self._stream_impl()
-            return self._stream
+                raise exceptions.FileNotFoundError("%s does not exist" % self.uri.geturl())
+            self.__stream__ = self._stream()
+        return self.__stream__
 
     def walk(self, **kwargs):
         """ Walk the contents of a directory. """
-        return self._walk_impl(**kwargs)
+        return self._walk(**kwargs)
 
-    def _walk_impl(self, **kwargs):
-        """ Implementation of walk(). """
-        return os.walk(self.path, **kwargs)
+    def write(self, stream):
+        """ Write stream. """
+        self._write(stream)
 
-    def _stream_impl(self):
+    def _close(self):
+        """ Close stream implementation. """
+        if self.exists():
+            return self.stream().close()
+
+    def _exists(self):
+        """ Test file existence implementation. """
+        return os.path.exists(self.path)
+
+    def _read(self, *size):
+        """ Read file stream implementation. """
+        return self.stream().read(*size)
+
+    def _stream(self):
         """ Implementation of stream(). """
         return open(self.path, self.mode)
 
+    def _walk(self, **kwargs):
+        """ Implementation of walk(). """
+        return os.walk(self.path, **kwargs)
+
+    def _write(self, stream):
+        """ Write stream implementation. """
+        if not os.path.exists(self.workdir) and ('w' in self.mode or 'a' in self.mode):
+            os.makedirs(self.workdir)
+        try:
+            return self.stream().write(stream.read())
+        except AttributeError:
+            return self.stream().write(stream)
+
 
 class RemoteFile(File):
-    """ Remote file implentation. """
-
+    """ Remote file implementation. """
     def __init__(self, uri, mode='r', **connectkw):
         super(RemoteFile, self).__init__(uri, mode=mode)
         self.__connect__ = connectkw
+        self.__connection__ = None
 
     @property
     def connection(self):
         """ Remote connection. """
-        try:
-            return self._connection
-        except AttributeError:
-            self._connection = self.connect()
-            return self._connection
+        if self.__connection__ is None:
+            self.connect()
+        return self.__connection__
 
-    def connect(self, **kwargs):
+    def connect(self, **connectkw):
         """ Connect to remote. """
-        raise NotImplementedError
+        if any(connectkw):
+            self.__connect__ = connectkw
+        self.__connection__ = self._connect()
 
     def download(self, target):
         """ Download remote file to local target URI. """
+        return self._download(target)
+
+    def _connect(self):
+        """ Connect to remote implementation. """
         raise NotImplementedError
 
-    def exists(self):
+    def _download(self, target):
+        """ Download remote file to local target URI implementation. """
+        raise NotImplementedError
+
+    def _exists(self):
         """ Test file existence. """
         raise NotImplementedError
 
-    def write(self, stream):
+    def _write(self, stream):
         """ Write stream to file. """
         raise NotImplementedError
 
-    def _walk_impl(self, **kwargs):
+    def _walk(self, **kwargs):
         """ Implementation of walk(). """
         raise NotImplementedError
 
-    def _stream_impl(self):
+    def _stream(self):
         """ Implementation of stream(). """
         raise NotImplementedError

@@ -1,20 +1,14 @@
 """ fURI Mappings. """
 
 import collections
-import json
 import logging
 import os
-import yaml
 from . import exceptions
 from . import utils
 
 
 class FileMap(collections.Mapping):
     """ Base configuration for file objects. """
-    __dispatch__ = {
-        '.json' : json.loads,
-        '.yaml' : yaml.load,
-        '.yml'  : yaml.load}
 
     def __init__(self, uri, **kwargs):
         self.source = utils.open(uri, **kwargs)
@@ -27,27 +21,27 @@ class FileMap(collections.Mapping):
 
     def __getitem__(self, key):
         try:
-            return self.__read()[key]
+            return self._read()[key]
         except Exception as err:
             raise KeyError(err.message)
 
     def __iter__(self):
         try:
-            return iter(self.__read())
+            return iter(self._read())
         except Exception as err:
             raise StopIteration(err.message)
 
     def __len__(self):
         try:
-            return len(self.__read())
+            return len(self._read())
         except Exception as err:
             raise ValueError(err.message)
 
-    def __read(self):
+    def _read(self):
         """ Read contents and parse from __dispatch__. """
         ext = os.path.splitext(str(self))[-1]
         try:
-            func = self.__dispatch__[ext]
+            func = utils.__extdispatch__[ext]
         except KeyError:
             raise exceptions.ExtensionError("Unsupported file extension: '%s'" % ext)
         return func(self.source.read())
@@ -59,15 +53,15 @@ class ChainedMap(collections.Mapping):
         self.mappings = mappings
 
     def __getitem__(self, key):
-        return self.__read('__getitem__', key)
+        return self._read('__getitem__', key)
 
     def __iter__(self):
-        return self.__read('__iter__')
+        return self._read('__iter__')
 
     def __len__(self):
-        return self.__read('__len__')
+        return self._read('__len__')
 
-    def __read(self, func, *args, **kwargs):
+    def _read(self, func, *args, **kwargs):
         """ Try to access mappings in chain, return the first success.
 
             Arguments:
@@ -91,6 +85,6 @@ def chain(*mappings):
     return ChainedMap(*mappings)
 
 
-utils.add_handler('' , FileMap, 'map')
-utils.add_handler('file', FileMap, 'map')
-utils.add_handler('s3', FileMap, 'map')
+utils.add_mapper('', FileMap)
+utils.add_mapper('file', FileMap)
+utils.add_mapper('s3', FileMap)
