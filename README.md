@@ -4,7 +4,7 @@
 
 Interact with local &amp; remote files by URI
 
-Last updated: `0.6.0`
+Last updated: `0.6.8`
 
 
 ## Installation
@@ -93,6 +93,12 @@ Supply the credentials as a part of the URI:
 
 ```python
 sftpfile = furi.open('sftp://user:password@host/workdir/file.ext')
+```
+
+Or with a key:
+
+```python
+sftpfile = furi.open('sftp://user@host/workdir/file.ext', private_key='/path/to/ssh_id')
 ```
 
 
