@@ -2,8 +2,6 @@ __author__ = 'amancevice'
 
 
 import furi
-import furi.aws
-import furi.sftp
 from nose.tools import assert_equal, raises
 
 
@@ -31,7 +29,7 @@ def test_dispatch_sftp():
     assert_equal(returned, expected)
 
 
-@raises(ValueError)
+@raises(furi.exceptions.SchemeError)
 def test_bad_scheme():
     furi.open('foo://bar/path/test')
 

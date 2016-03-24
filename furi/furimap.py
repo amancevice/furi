@@ -5,6 +5,7 @@ import json
 import logging
 import os
 import yaml
+from . import exceptions
 from . import utils
 
 
@@ -45,7 +46,10 @@ class FileMap(collections.Mapping):
     def __read(self):
         """ Read contents and parse from __dispatch__. """
         ext = os.path.splitext(str(self))[-1]
-        func = self.__dispatch__.get(ext, lambda x: x)
+        try:
+            func = self.__dispatch__[ext]
+        except KeyError:
+            raise exceptions.ExtensionError("Unsupported file extension: '%s'" % ext)
         return func(self.source.read())
 
 

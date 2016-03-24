@@ -4,6 +4,7 @@
 import os
 from urlparse import urlparse
 from . import furifile
+from . import exceptions
 
 
 def add_handler(scheme, handler_class, handler_type='file'):
@@ -27,7 +28,7 @@ def map(uri, **kwargs):
     try:
         return __dispatch__['map'][uri.scheme](uri.geturl(), **kwargs)
     except KeyError:
-        raise ValueError("Unsupported URI scheme: '%s'" % uri.scheme)
+        raise exceptions.SchemeError("Unsupported URI scheme: '%s'" % uri.scheme)
 
 
 def open(uri, **kwargs):
@@ -36,7 +37,7 @@ def open(uri, **kwargs):
     try:
         return __dispatch__['file'][uri.scheme](uri.geturl(), **kwargs)
     except KeyError:
-        raise ValueError("Unsupported URI scheme: '%s'" % uri.scheme)
+        raise exceptions.SchemeError("Unsupported URI scheme: '%s'" % uri.scheme)
 
 
 def walk(uri, **kwargs):
@@ -61,9 +62,10 @@ def download(source, target=None, **credentials):
     tgt = open(target or os.path.expanduser("~/Downloads/%s" % src.filename), mode='rw')
 
     if not isinstance(src, furifile.RemoteFile):
-        raise TypeError("Cannot download from non-RemoteFile.")
+        raise exceptions.DownloadError("Cannot download from non-RemoteFile.")
     if isinstance(tgt, furifile.RemoteFile):
-        raise TypeError("Cannot download RemoteFile to other RemoteFile. Use local URI.")
+        raise exceptions.DownloadError(
+            "Cannot download RemoteFile to other RemoteFile. Use local URI.")
 
     return src.download(tgt)
 

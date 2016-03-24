@@ -4,6 +4,7 @@ import collections
 import os
 import re
 from urlparse import urlparse
+from . import exceptions
 
 
 MODES = 'r', 'rb', 'r+', 'rb+', 'w', 'wb', 'w+', 'wb+', 'a', 'ab', 'a+', 'ab+'
@@ -19,7 +20,8 @@ class File(collections.Iterable):
 
     def __init__(self, uri, mode='r'):
         if mode not in self.modes and not set(mode).issubset(self.modes):
-            raise ValueError("Cannot open %s in %s-mode" % (type(self).__name__, mode))
+            raise exceptions.ModeError(
+                "Cannot open %s in %s-mode" % (type(self).__name__, mode))
         self.uri  = urlparse(uri)
         self.path = self.uri.path
         self.mode = mode

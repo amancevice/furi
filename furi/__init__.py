@@ -6,6 +6,7 @@ __email__   = "smallweirdnum@gmail.com"
 __version__ = "0.6.7"
 
 
+from . import exceptions
 from .furimap import chain
 from .utils import add_handler
 from .utils import download
