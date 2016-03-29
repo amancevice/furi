@@ -1,5 +1,8 @@
 # furi Changelog
 
+0.6.9
+* Bugfix for stream() handling
+
 0.6.7
 * Bugfix for SFTP files to chdir before attempting to get
 
