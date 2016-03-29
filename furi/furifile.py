@@ -64,7 +64,7 @@ class File(collections.Iterable):
 
     def stream(self):
         """ Get file contents as stream. """
-        if self.__stream__ is not None:
+        if self.__stream__ is not None and hasattr(self.__stream__, 'seek'):
             self.__stream__.seek(0)
         else:
             if not self.exists() and 'w' not in self.mode:

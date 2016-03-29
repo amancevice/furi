@@ -71,6 +71,19 @@ def test_download():
 
 
 @moto.mock_s3
+def test_s3_stream():
+    value = "Hello, world!\n\nGoodby, cruel world."
+    ms3   = boto.connect_s3()
+    bkt   = ms3.create_bucket('furi')
+    key   = boto.s3.key.Key(bkt, 'foo/bar/bizz/buzz')
+    key.set_contents_from_string(value)
+
+    with furi.open('s3://furi/foo/bar/bizz/buzz') as tmp:
+        tmp.stream()
+        tmp.stream()
+
+
+@moto.mock_s3
 def test_exists():
     value = "Hello, world!\n\nGoodby, cruel world."
     ms3   = boto.connect_s3()
