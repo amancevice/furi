@@ -1,4 +1,5 @@
 import io
+import os
 import re
 import tempfile
 import boto
@@ -130,7 +131,7 @@ def test_write_stream():
         yield assert_equal, s3furi.read(), value
 
 @moto.mock_s3
-def test_walk():
+def test_s3_walk():
     value = "Hello, world!\n\nGoodby, cruel world."
     ms3   = boto.connect_s3()
     bkt   = ms3.create_bucket('furi')
@@ -147,3 +148,22 @@ def test_walk():
         ('s3://furi/foo/bar/',      ['bizz'],        []),
         ('s3://furi/foo/bar/bizz/', [],              ['buzz', 'fizz']) ]
     assert_equal(returned, expected)
+
+def test_walk():
+    with tempfile.NamedTemporaryFile() as tmp:
+        path = os.path.split(tmp.name)[0]
+        os.chdir(path)
+        for keyname in ['foo/baq/bug', 'foo/bar/bizz/buzz', 'foo/bar/bizz/fizz', 'foo/ban']:
+            fpath, fname = os.path.split(keyname)
+            if not os.path.exists(fpath):
+                os.makedirs(fpath)
+            with open(keyname, 'w') as tmpf:
+                tmpf.write("Hello, world!\n\nGoodby, cruel world.")
+
+        returned = list(furi.walk('foo'))
+        expected = [
+            ('foo',          ['baq', 'bar'],  ['ban']),
+            ('foo/baq',      [],              ['bug']),
+            ('foo/bar',      ['bizz'],        []),
+            ('foo/bar/bizz', [],              ['buzz', 'fizz']) ]
+        assert_equal(returned, expected)
