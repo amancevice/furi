@@ -85,7 +85,7 @@ class File(collections.Iterable):
         if self.__stream__ is not None:
             try:
                 return self.__stream__.close()
-            except:
+            except Exception:
                 pass
             finally:
                 self.__stream__ = None
