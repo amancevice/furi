@@ -82,11 +82,12 @@ class File(collections.Iterable):
 
     def _close(self):
         """ Close stream implementation. """
-        if self.exists():
-            try:
-                return self.stream().close()
-            except IOError:
-                pass
+        try:
+            self.__stream__.close()
+        except:  # pylint: disable=bare-except
+            pass
+        finally:
+            self.__stream__ = None
 
     def _exists(self):
         """ Test file existence implementation. """

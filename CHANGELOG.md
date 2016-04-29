@@ -1,5 +1,11 @@
 # furi Changelog
 
+0.6.11
+* Bugfix so that _close() no longer calls exists() or stream() with side effects and possible exceptions
+
+0.6.10
+* Bugfix for FS walk
+
 0.6.9
 * Bugfix for stream() handling
 
