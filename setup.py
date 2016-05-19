@@ -15,14 +15,14 @@ CLASSIFIERS = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 2.7",
     "Topic :: Utilities" ]
-TEST_REQUIRES  = ["boto", "nose", "mock", "moto"]
+TESTS_REQUIRE  = ["boto", "nose", "mock", "moto"]
 AWS_REQUIRES   = ["boto3>=1.2.3"]
 SFTP_REQUIRES  = ["pysftp>=0.2.8"]
 REQUIRES       = ["PyYAML>=3.11.0"]
 EXTRAS_REQUIRE = {
     'aws'  : AWS_REQUIRES,
     'sftp' : SFTP_REQUIRES,
-    'test' : TEST_REQUIRES,
+    'test' : TESTS_REQUIRE,
     'all'  : AWS_REQUIRES + SFTP_REQUIRES + REQUIRES }
 
 def read(fname):
@@ -46,6 +46,6 @@ setup(
     long_description     = read('README.md'),
     classifiers          = CLASSIFIERS,
     install_requires     = REQUIRES,
-    test_requires        = TEST_REQUIRES,
+    tests_require        = TESTS_REQUIRE,
     extras_require       = EXTRAS_REQUIRE,
     test_suite           = "nose.collector" )
