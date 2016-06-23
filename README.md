@@ -5,8 +5,6 @@
 
 Interact with local &amp; remote files by URI
 
-Last updated: `0.6.9`
-
 
 ## Installation
 
