@@ -11,7 +11,7 @@ class ExtensionError(KeyError):
     pass
 
 
-class FileNotFoundError(ValueError):
+class FuriFileNotFoundError(ValueError):
     """ File does not exist. """
     pass
 

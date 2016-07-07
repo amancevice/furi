@@ -1,8 +1,8 @@
 """ fURI Mappings. """
 
 import collections
-import logging
 import os
+
 from . import exceptions
 from . import utils
 
@@ -23,19 +23,19 @@ class FileMap(collections.Mapping):
         try:
             return self._read()[key]
         except Exception as err:
-            raise KeyError(err.message)
+            raise KeyError(err)
 
     def __iter__(self):
         try:
             return iter(self._read())
         except Exception as err:
-            raise StopIteration(err.message)
+            raise StopIteration(err)
 
     def __len__(self):
         try:
             return len(self._read())
         except Exception as err:
-            raise ValueError(err.message)
+            raise ValueError(err)
 
     def _read(self):
         """ Read contents and parse from __dispatch__. """
@@ -76,7 +76,7 @@ class ChainedMap(collections.Mapping):
             try:
                 return getattr(cfg, func)(*args, **kwargs)
             except (KeyError, ValueError, StopIteration) as err:
-                logging.warn("%s :: %r", cfg, err)
+                pass
         raise err
 
 

@@ -3,7 +3,11 @@
 
 import json
 import os
-from urlparse import urlparse
+try:
+    from urlparse import urlparse
+except ImportError:
+    from urllib.parse import urlparse
+
 import yaml
 from . import furifile
 from . import exceptions
@@ -79,7 +83,7 @@ def download(source, target=None, **credentials):
             Handle to target file """
     src = open(source)
     src.connect(**credentials)
-    tgt = open(target or os.path.expanduser("~/Downloads/%s" % src.filename), mode='rw')
+    tgt = open(target or os.path.expanduser("~/Downloads/%s" % src.filename), mode='r+')
 
     if not isinstance(src, furifile.RemoteFile):
         raise exceptions.DownloadError("Cannot download from non-RemoteFile.")

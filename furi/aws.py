@@ -3,7 +3,7 @@
 import collections
 import os
 import re
-from urlparse import urlparse
+
 import boto3
 import botocore
 from . import furifile
@@ -80,7 +80,7 @@ class S3File(furifile.RemoteFile):
             if filename:
                 tree[history]['filenames'].add(filename)
 
-        for dirpath in sorted(tree.keys()):
+        for dirpath in sorted(tree):
             dirdata = tree[dirpath]
             dirnames = sorted(dirdata['dirnames'])
             filenames = sorted(dirdata['filenames'])
@@ -91,7 +91,7 @@ class S3File(furifile.RemoteFile):
 class DynamoMap(collections.Iterable):
     """ DynamoDB-backed mappings. """
     def __init__(self, uri, **connectkw):
-        self.uri = urlparse(uri)
+        self.uri = utils.urlparse(uri)
         self.connection = boto3.resource('dynamodb', **connectkw)
         self.table = self.connection.Table(self.uri.netloc)
 

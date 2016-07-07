@@ -3,7 +3,11 @@
 import collections
 import os
 import re
-from urlparse import urlparse
+try:
+    from urlparse import urlparse
+except ImportError:
+    from urllib.parse import urlparse
+
 from . import exceptions
 
 
@@ -68,7 +72,7 @@ class File(collections.Iterable):
             self.__stream__.seek(0)
         else:
             if not self.exists() and 'w' not in self.mode:
-                raise exceptions.FileNotFoundError("%s does not exist" % self.uri.geturl())
+                raise exceptions.FuriFileNotFoundError("%s does not exist" % self.uri.geturl())
             self.__stream__ = self._stream()
         return self.__stream__
 

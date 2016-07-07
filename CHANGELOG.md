@@ -1,5 +1,8 @@
 # furi Changelog
 
+0.7.0
+* Python3 support
+
 0.6.11
 * Bugfix so that _close() no longer calls exists() or stream() with side effects and possible exceptions
 

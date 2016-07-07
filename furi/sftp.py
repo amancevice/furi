@@ -4,6 +4,7 @@ import io
 import os
 import re
 import tempfile
+
 import pysftp
 from . import furifile
 from . import utils
@@ -48,7 +49,11 @@ class SftpFile(furifile.RemoteFile):
         with tempfile.NamedTemporaryFile() as tmp:
             self.connection.get(self.path, tmp.name)
             tmp.flush()
-            return io.StringIO(unicode(tmp.read()))
+            try:
+                return io.StringIO(unicode(tmp.read()))
+            except NameError:
+                io.StringIO(tmp.read())
+
 
     def _walk(self):
         """ Implementation of walk(). """
