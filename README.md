@@ -1,8 +1,8 @@
 # fURI
 
 [![build](https://travis-ci.org/amancevice/furi.svg?branch=master)](https://travis-ci.org/amancevice/furi)
-[![pypi](https://badge.fury.io/py/furi.svg)](https://badge.fury.io/py/furi)
 [![codecov](https://codecov.io/gh/amancevice/furi/branch/master/graph/badge.svg)](https://codecov.io/gh/amancevice/furi)
+[![pypi](https://badge.fury.io/py/furi.svg)](https://badge.fury.io/py/furi)
 
 Interact with local &amp; remote files by URI
 
