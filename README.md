@@ -1,7 +1,8 @@
 # fURI
 
-[![Build Status](https://travis-ci.org/amancevice/furi.svg?branch=master)](https://travis-ci.org/amancevice/furi)
-[![PyPI version](https://badge.fury.io/py/furi.svg)](https://badge.fury.io/py/furi)
+[![build](https://travis-ci.org/amancevice/furi.svg?branch=master)](https://travis-ci.org/amancevice/furi)
+[![pypi](https://badge.fury.io/py/furi.svg)](https://badge.fury.io/py/furi)
+[![codecov](https://codecov.io/gh/amancevice/furi/branch/master/graph/badge.svg)](https://codecov.io/gh/amancevice/furi)
 
 Interact with local &amp; remote files by URI
 
@@ -81,7 +82,7 @@ Example S3-file access:
 s3file = furi.open('s3://bucket/path/to/key')
 
 # Supply credentials
-s3file = furi.open('s3://bucket/path/to/key', 
+s3file = furi.open('s3://bucket/path/to/key',
     aws_access_key_id='ACCESS', aws_secret_access_key='SECRET' )
 ```
 
@@ -105,7 +106,7 @@ sftpfile = furi.open('sftp://user@host/workdir/file.ext', private_key='/path/to/
 
 ```python
 # Open a file in a supported open-mode
-with furi.open('<uri>', mode='<mode>') as furifile: 
+with furi.open('<uri>', mode='<mode>') as furifile:
     furifile.exists()                  # Test if file exists
     furifile.matches('regex pattern')  # Match pattern to filename (not including path)
     furifile.read()                    # Read file contents' stream as string
@@ -135,7 +136,7 @@ print mymap['otherkey'] # Reads file from S3 again
 # => "Goodby, cruel world!"
 
 # Reads the file once and caches it in `mymap`
-mymap = dict(furi.map('s3://buket/path/to/mapping.json')) 
+mymap = dict(furi.map('s3://buket/path/to/mapping.json'))
 ```
 
 

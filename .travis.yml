@@ -5,10 +5,11 @@ python:
 - '3.3'
 - '3.4'
 - '3.5'
-install: pip install -e .[all] boto mock moto nose pylint
+install: pip install -e .[all] boto codecov mock moto nose pylint
 script:
-- nosetests
+- nosetests --with-coverage
 - pylint furi
+after_success: codecov
 deploy:
   provider: pypi
   user: amancevice
