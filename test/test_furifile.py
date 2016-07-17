@@ -195,7 +195,7 @@ def test_iter():
         "This is line 2\n"]
     with tempfile.NamedTemporaryFile() as tmp:
         for line in lines:
-            tmp.write(line)
+            tmp.write(line.encode("utf8"))
         tmp.flush()
         furifile = furi.open(tmp.name)
         returned = list(iter(furifile))
