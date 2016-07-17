@@ -84,12 +84,13 @@ def download(source, target=None, **credentials):
         Returns:
             Handle to target file """
     src = open(source)
+    if not isinstance(src, furifile.RemoteFile):
+        raise exceptions.DownloadError("Cannot download from non-RemoteFile.")
+
     src.connect(**credentials)
     tgt = open(target or os.path.expanduser(
         "~/Downloads/%s" % src.filename), mode='r+')
 
-    if not isinstance(src, furifile.RemoteFile):
-        raise exceptions.DownloadError("Cannot download from non-RemoteFile.")
     if isinstance(tgt, furifile.RemoteFile):
         raise exceptions.DownloadError(
             "Cannot download RemoteFile to other RemoteFile. Use local URI.")
