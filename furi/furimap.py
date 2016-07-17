@@ -3,7 +3,6 @@
 import collections
 import os
 
-from . import exceptions
 from . import utils
 
 
@@ -40,11 +39,7 @@ class FileMap(collections.Mapping):
     def _read(self):
         """ Read contents and parse from __dispatch__. """
         ext = os.path.splitext(str(self))[-1]
-        try:
-            func = utils.__extdispatch__[ext]
-        except KeyError:
-            raise exceptions.ExtensionError(
-                "Unsupported file extension: '%s'" % ext)
+        func = utils.extfunc(ext)
         return func(self.source.read())
 
 

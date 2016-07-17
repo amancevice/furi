@@ -97,6 +97,15 @@ def download(source, target=None, **credentials):
     return src.download(tgt)
 
 
+def extfunc(ext):
+    """ Helper to get reader function for file extension. """
+    try:
+        return __extdispatch__[ext]
+    except KeyError:
+        raise exceptions.ExtensionError(
+            "Unsupported file extension: '%s'" % ext)
+
+
 __dispatch__ = {
     '': furifile.File,
     'file': furifile.File}
