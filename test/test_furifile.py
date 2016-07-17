@@ -2,11 +2,14 @@ import io
 import os
 import re
 import tempfile
+
 import boto
 import furi
+import mock
 import moto
 from nose.tools import assert_equal
 from nose.tools import assert_is_instance
+from nose.tools import raises
 
 
 def test_matches():
@@ -61,9 +64,9 @@ def test_write():
 @moto.mock_s3
 def test_download():
     value = "Hello, world!\n\nGoodby, cruel world."
-    ms3   = boto.connect_s3()
-    bkt   = ms3.create_bucket('furi')
-    key   = boto.s3.key.Key(bkt, 'foo/bar/bizz/buzz')
+    ms3 = boto.connect_s3()
+    bkt = ms3.create_bucket('furi')
+    key = boto.s3.key.Key(bkt, 'foo/bar/bizz/buzz')
     key.set_contents_from_string(value)
 
     with tempfile.NamedTemporaryFile() as tmp:
@@ -74,9 +77,9 @@ def test_download():
 @moto.mock_s3
 def test_s3_stream():
     value = "Hello, world!\n\nGoodby, cruel world."
-    ms3   = boto.connect_s3()
-    bkt   = ms3.create_bucket('furi')
-    key   = boto.s3.key.Key(bkt, 'foo/bar/bizz/buzz')
+    ms3 = boto.connect_s3()
+    bkt = ms3.create_bucket('furi')
+    key = boto.s3.key.Key(bkt, 'foo/bar/bizz/buzz')
     key.set_contents_from_string(value)
 
     with furi.open('s3://furi/foo/bar/bizz/buzz') as tmp:
@@ -87,9 +90,9 @@ def test_s3_stream():
 @moto.mock_s3
 def test_exists():
     value = "Hello, world!\n\nGoodby, cruel world."
-    ms3   = boto.connect_s3()
-    bkt   = ms3.create_bucket('furi')
-    key   = boto.s3.key.Key(bkt, 'foo/bar/bizz/buzz')
+    ms3 = boto.connect_s3()
+    bkt = ms3.create_bucket('furi')
+    key = boto.s3.key.Key(bkt, 'foo/bar/bizz/buzz')
     key.set_contents_from_string(value)
 
     s3furi = furi.open('s3://furi/foo/bar/bizz/buzz')
@@ -111,7 +114,7 @@ def test_write():
     bkt = ms3.create_bucket('furi')
     key = boto.s3.key.Key(bkt)
     key.name = 'foo/bar/bizz/buzz'
-    value    = "Hello, world!\n\nGoodby, cruel world."
+    value = "Hello, world!\n\nGoodby, cruel world."
     key.set_contents_from_string(value)
 
     with furi.open('s3://furi/foo/bar/bizz/buzz', mode='w') as s3furi:
@@ -124,19 +127,21 @@ def test_write_stream():
     bkt = ms3.create_bucket('furi')
     key = boto.s3.key.Key(bkt)
     key.name = 'foo/bar/bizz/buzz'
-    value    = "Hello, world!\n\nGoodby, cruel world."
+    value = "Hello, world!\n\nGoodby, cruel world."
     key.set_contents_from_stream(io.StringIO(unicode(value)))
 
     with furi.open('s3://furi/foo/bar/bizz/buzz', mode='w') as s3furi:
         yield assert_equal, s3furi.read(), value
 
+
 @moto.mock_s3
 def test_s3_walk():
     value = "Hello, world!\n\nGoodby, cruel world."
-    ms3   = boto.connect_s3()
-    bkt   = ms3.create_bucket('furi')
+    ms3 = boto.connect_s3()
+    bkt = ms3.create_bucket('furi')
 
-    for keyname in ['foo/baq/bug', 'foo/bar/bizz/buzz', 'foo/bar/bizz/fizz', 'foo/ban']:
+    keys = ['foo/baq/bug', 'foo/bar/bizz/buzz', 'foo/bar/bizz/fizz', 'foo/ban']
+    for keyname in keys:
         key = boto.s3.key.Key(bkt)
         key.name = keyname
         key.set_contents_from_string(value)
@@ -146,14 +151,17 @@ def test_s3_walk():
         ('s3://furi/foo/',          ['baq', 'bar'],  ['ban']),
         ('s3://furi/foo/baq/',      [],              ['bug']),
         ('s3://furi/foo/bar/',      ['bizz'],        []),
-        ('s3://furi/foo/bar/bizz/', [],              ['buzz', 'fizz']) ]
+        ('s3://furi/foo/bar/bizz/', [],              ['buzz', 'fizz'])]
     assert_equal(returned, expected)
+
 
 def test_walk():
     with tempfile.NamedTemporaryFile() as tmp:
         path = os.path.split(tmp.name)[0]
         os.chdir(path)
-        for keyname in ['foo/baq/bug', 'foo/bar/bizz/buzz', 'foo/bar/bizz/fizz', 'foo/ban']:
+        keys = [
+            'foo/baq/bug', 'foo/bar/bizz/buzz', 'foo/bar/bizz/fizz', 'foo/ban']
+        for keyname in keys:
             fpath, fname = os.path.split(keyname)
             if not os.path.exists(fpath):
                 os.makedirs(fpath)
@@ -165,5 +173,80 @@ def test_walk():
             ('foo',          ['baq', 'bar'],  ['ban']),
             ('foo/baq',      [],              ['bug']),
             ('foo/bar',      ['bizz'],        []),
-            ('foo/bar/bizz', [],              ['buzz', 'fizz']) ]
+            ('foo/bar/bizz', [],              ['buzz', 'fizz'])]
         assert_equal(returned, expected)
+
+
+@raises(furi.exceptions.ModeError)
+def test_bad_mode():
+    furi.open("foo.txt", mode="j")
+
+
+def test_repr():
+    furifile = furi.open("/path/to/file")
+    returned = repr(furifile)
+    expected = "<File: /path/to/file>"
+    assert_equal(returned, expected)
+
+
+def test_iter():
+    lines = [
+        "This is line 1\n",
+        "This is line 2\n"]
+    with tempfile.NamedTemporaryFile() as tmp:
+        for line in lines:
+            tmp.write(line)
+        tmp.flush()
+        furifile = furi.open(tmp.name)
+        returned = list(iter(furifile))
+    assert_equal(returned, lines)
+
+
+@raises(furi.exceptions.FuriFileNotFoundError)
+def test_cant_stream():
+    furi.open("/path/to/file").stream()
+
+
+@mock.patch("furi.furifile.RemoteFile._connect")
+def test_connectkw(mock_connect):
+    expected = dict(connect_kw1="fizz", connect_kw2="buzz")
+    furifile = furi.furifile.RemoteFile("s3://bucket/path/to/file")
+    furifile.connect(**expected)
+    returned = furifile.__connect__
+    assert_equal(returned, expected)
+
+
+@raises(NotImplementedError)
+def test__connect():
+    furifile = furi.furifile.RemoteFile("s3://bucket/path/to/file")
+    furifile._connect()
+
+
+@raises(NotImplementedError)
+def test__download():
+    furifile = furi.furifile.RemoteFile("s3://bucket/path/to/file")
+    furifile._download(None)
+
+
+@raises(NotImplementedError)
+def test__exists():
+    furifile = furi.furifile.RemoteFile("s3://bucket/path/to/file")
+    furifile._exists()
+
+
+@raises(NotImplementedError)
+def test__write():
+    furifile = furi.furifile.RemoteFile("s3://bucket/path/to/file")
+    furifile._write(None)
+
+
+@raises(NotImplementedError)
+def test__walk():
+    furifile = furi.furifile.RemoteFile("s3://bucket/path/to/file")
+    furifile._walk()
+
+
+@raises(NotImplementedError)
+def test__stream():
+    furifile = furi.furifile.RemoteFile("s3://bucket/path/to/file")
+    furifile._stream()

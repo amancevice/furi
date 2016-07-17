@@ -7,8 +7,8 @@ from .utils import add_mapper
 from .utils import add_mapext
 from .utils import download
 from .utils import exists
-from .utils import map  # pylint: disable=redefined-builtin
-from .utils import open # pylint: disable=redefined-builtin
+from .utils import map   # pylint: disable=redefined-builtin
+from .utils import open  # pylint: disable=redefined-builtin
 from .utils import walk
 try:
     from . import aws

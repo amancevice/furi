@@ -18,10 +18,10 @@ class SftpFile(furifile.RemoteFile):
     def _connect(self):
         """ Connect to remote. Credentials can be passed as part of URI. """
         # Get user, pswd, and host from URI
-        ptn = r'^((?P<user>.*?)(:(?P<pswd>.*))?@)?(?P<host>.*?):?(?P<port>\d+)?$'
+        ptn = r'^((?P<user>.*?)(:(?P<pw>.*))?@)?(?P<host>.*?):?(?P<port>\d+)?$'
         match = re.match(ptn, self.uri.netloc)
         user = match.group('user')
-        pswd = match.group('pswd')
+        pswd = match.group('pw')
         host = match.group('host')
         port = int(match.group('port') or '22')
 
@@ -54,7 +54,6 @@ class SftpFile(furifile.RemoteFile):
             except NameError:
                 io.StringIO(tmp.read())
 
-
     def _walk(self):
         """ Implementation of walk(). """
         def __walk(dirpath):
@@ -62,7 +61,8 @@ class SftpFile(furifile.RemoteFile):
             wtcb = pysftp.WTCallbacks()
             self.connection.walktree(
                 dirpath, wtcb.file_cb, wtcb.dir_cb, wtcb.unk_cb, recurse=False)
-            yield dirpath, wtcb.dlist, [os.path.split(x)[-1] for x in wtcb.flist]
+            yield dirpath, wtcb.dlist, \
+                [os.path.split(x)[-1] for x in wtcb.flist]
             for dirname in wtcb.dlist:
                 for dirpath, dirnames, filenames in __walk(dirname):
                     yield dirpath, dirnames, filenames

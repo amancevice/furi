@@ -17,10 +17,12 @@ class File(collections.Iterable):
         Exs. file:///abs/path/to/file.ext
              /abs/path/to/file.ext """
 
-    __modes__ = {'r', 'rb', 'r+', 'rb+', 'w', 'wb', 'w+', 'wb+', 'a', 'ab', 'a+', 'ab+'}
+    __modes__ = {
+        'r', 'rb', 'r+', 'rb+', 'w', 'wb', 'w+', 'wb+', 'a', 'ab', 'a+', 'ab+'}
 
     def __init__(self, uri, mode='r'):
-        if mode not in self.__modes__ and not set(mode).issubset(self.__modes__):
+        if mode not in self.__modes__ \
+                and not set(mode).issubset(self.__modes__):
             raise exceptions.ModeError(
                 "Cannot open %s in %s-mode" % (type(self).__name__, mode))
         self.uri = urlparse(uri)
@@ -72,7 +74,8 @@ class File(collections.Iterable):
             self.__stream__.seek(0)
         else:
             if not self.exists() and 'w' not in self.mode:
-                raise exceptions.FuriFileNotFoundError("%s does not exist" % self.uri.geturl())
+                raise exceptions.FuriFileNotFoundError(
+                    "%s does not exist" % self.uri.geturl())
             self.__stream__ = self._stream()
         return self.__stream__
 
@@ -111,7 +114,8 @@ class File(collections.Iterable):
 
     def _write(self, stream):
         """ Write stream implementation. """
-        if not os.path.exists(self.workdir) and ('w' in self.mode or 'a' in self.mode):
+        if not os.path.exists(self.workdir) \
+                and ('w' in self.mode or 'a' in self.mode):
             os.makedirs(self.workdir)
         try:
             return self.stream().write(stream.read())

@@ -43,7 +43,8 @@ class FileMap(collections.Mapping):
         try:
             func = utils.__extdispatch__[ext]
         except KeyError:
-            raise exceptions.ExtensionError("Unsupported file extension: '%s'" % ext)
+            raise exceptions.ExtensionError(
+                "Unsupported file extension: '%s'" % ext)
         return func(self.source.read())
 
 

@@ -46,22 +46,24 @@ def exists(uri, **kwargs):
         return exister.exists()
 
 
-def map(uri, **kwargs): # pylint: disable=redefined-builtin
+def map(uri, **kwargs):  # pylint: disable=redefined-builtin
     """ Return a Mapping object from a URI. """
     uri = urlparse(os.path.expanduser(uri))
     try:
         return __mapdispatch__[uri.scheme](uri.geturl(), **kwargs)
     except KeyError:
-        raise exceptions.SchemeError("Unsupported URI scheme: '%s'" % uri.scheme)
+        raise exceptions.SchemeError(
+            "Unsupported URI scheme: '%s'" % uri.scheme)
 
 
-def open(uri, **kwargs): # pylint: disable=redefined-builtin
+def open(uri, **kwargs):  # pylint: disable=redefined-builtin
     """ Returns a File object given a URI. """
     uri = urlparse(os.path.expanduser(uri))
     try:
         return __dispatch__[uri.scheme](uri.geturl(), **kwargs)
     except KeyError:
-        raise exceptions.SchemeError("Unsupported URI scheme: '%s'" % uri.scheme)
+        raise exceptions.SchemeError(
+            "Unsupported URI scheme: '%s'" % uri.scheme)
 
 
 def walk(uri, **kwargs):
@@ -71,8 +73,8 @@ def walk(uri, **kwargs):
 
 
 def download(source, target=None, **credentials):
-    """ Download contents of a source URI into a target URI. If target URI is omitted,
-        source is downloaded to ~/Downloads using the same filename.
+    """ Download contents of a source URI into a target URI. If target URI is
+        omitted, source is downloaded to ~/Downloads using the same filename.
 
         Arguments:
             source      (str):   URI of source file
@@ -83,7 +85,8 @@ def download(source, target=None, **credentials):
             Handle to target file """
     src = open(source)
     src.connect(**credentials)
-    tgt = open(target or os.path.expanduser("~/Downloads/%s" % src.filename), mode='r+')
+    tgt = open(target or os.path.expanduser(
+        "~/Downloads/%s" % src.filename), mode='r+')
 
     if not isinstance(src, furifile.RemoteFile):
         raise exceptions.DownloadError("Cannot download from non-RemoteFile.")
@@ -96,15 +99,13 @@ def download(source, target=None, **credentials):
 
 __dispatch__ = {
     '': furifile.File,
-    'file': furifile.File
-}
+    'file': furifile.File}
 
 
 __mapdispatch__ = {}
 
 
 __extdispatch__ = {
-    '.json' : json.loads,
-    '.yaml' : yaml.load,
-    '.yml'  : yaml.load
-}
+    '.json': json.loads,
+    '.yaml': yaml.load,
+    '.yml': yaml.load}

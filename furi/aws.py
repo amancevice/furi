@@ -24,15 +24,18 @@ class S3File(furifile.RemoteFile):
     @property
     def key(self):
         """ Remote key. """
-        return self.connection.Object(self.uri.netloc, self.uri.path.lstrip('/'))
+        return self.connection.Object(
+            self.uri.netloc, self.uri.path.lstrip('/'))
 
     def _connect(self):
         # Support boto-style access/secret keys
         if 'access_key' in self.__connect__:
-            self.__connect__['aws_access_key_id'] = self.__connect__['access_key']
+            self.__connect__['aws_access_key_id'] = \
+                self.__connect__['access_key']
             del self.__connect__['access_key']
         if 'secret_key' in self.__connect__:
-            self.__connect__['aws_secret_access_key'] = self.__connect__['secret_key']
+            self.__connect__['aws_secret_access_key'] = \
+                self.__connect__['secret_key']
             del self.__connect__['secret_key']
 
         # Connect to AWS
@@ -67,9 +70,10 @@ class S3File(furifile.RemoteFile):
     def _walk(self, **kwargs):
         """ Implementation of walk(). """
         root = str(re.sub('^/', '', self.uri.path))
-        tree = {root : {'dirnames': set(), 'filenames' : set()}}
+        tree = {root: {'dirnames': set(), 'filenames': set()}}
         for key in self.bucket.objects.filter(Prefix=self.key.key):
-            rel, filename = [str(x) for x in os.path.split(re.split("^%s" % root, key.key)[-1])]
+            rel, filename = [str(x) for x in os.path.split(
+                re.split("^%s" % root, key.key)[-1])]
             history = root
             for subdir in rel.split('/'):
                 if subdir:
@@ -114,7 +118,8 @@ class DynamoMap(collections.Iterable):
         for item in items:
             yield item
         while 'LastEvaluatedKey' in response:
-            response = self.table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
+            response = self.table.scan(
+                ExclusiveStartKey=response['LastEvaluatedKey'])
             items = response.get('Items') or []
             for item in items:
                 yield item
@@ -131,7 +136,8 @@ class DynamoMap(collections.Iterable):
         self.table.delete_item(Key=key)
 
     def _read(self, results=None):
-        """ Read Dynamo result and throw ValueError on non-200 response code. """
+        """ Read Dynamo result and throw ValueError on non-200 response code.
+        """
         results = results or self.table.scan()
         response = results.get('ResponseMetadata') or {}
         httpcode = response.get('HTTPStatusCode')
