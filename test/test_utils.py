@@ -17,6 +17,7 @@ def test_add_mapext():
     expected = mock_extfunc
     yield assert_in, "fizz", furi.utils.__extdispatch__
     yield assert_equal, returned, expected
+    yield assert_equal, "x", returned("x")
 
 
 @raises(KeyError)
@@ -35,11 +36,11 @@ def test_download_tgt_err():
 
 
 def test_extfunc():
-    returned = furi.utils.extfunc("json")
+    returned = furi.utils.extfunc(".json")
     expected = json.loads
     assert_equal(returned, expected)
 
 
 @raises(KeyError)
-def test_extfunc():
+def test_extfunc_keyerr():
     furi.utils.extfunc("buzz")

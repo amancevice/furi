@@ -24,12 +24,12 @@ def test_not_matches():
     assert not furifile.matches(pattern)
 
 
-def test_exists():
+def test_file_exists():
     furifile = furi.open(__file__)
     assert furifile.exists()
 
 
-def test_not_exists():
+def test_not_file_exists():
     furifile = furi.open('/foo/bar/fizz/buzz')
     assert not furifile.exists()
 
@@ -109,7 +109,7 @@ def test_not_exists():
 
 
 @moto.mock_s3
-def test_write():
+def test_s3_write():
     ms3 = boto.connect_s3()
     bkt = ms3.create_bucket('furi')
     key = boto.s3.key.Key(bkt)
@@ -122,7 +122,7 @@ def test_write():
 
 
 @moto.mock_s3
-def test_write_stream():
+def test_s3_write_stream():
     ms3 = boto.connect_s3()
     bkt = ms3.create_bucket('furi')
     key = boto.s3.key.Key(bkt)
