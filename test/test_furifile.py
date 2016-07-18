@@ -53,7 +53,7 @@ def test_stream_resets():
 
 
 def test_write():
-    value = "Hello, world!\n\nGoodby, cruel world."
+    value = "Hello, world!\n\nGoodbye, cruel world."
     with tempfile.NamedTemporaryFile() as tmp:
         furifile = furi.open(tmp.name, mode='w+')
         furifile.write(value)
@@ -63,7 +63,7 @@ def test_write():
 
 @moto.mock_s3
 def test_download():
-    value = "Hello, world!\n\nGoodby, cruel world."
+    value = "Hello, world!\n\nGoodbye, cruel world."
     ms3 = boto.connect_s3()
     bkt = ms3.create_bucket('furi')
     key = boto.s3.key.Key(bkt, 'foo/bar/bizz/buzz')
@@ -76,7 +76,7 @@ def test_download():
 
 @moto.mock_s3
 def test_s3_stream():
-    value = "Hello, world!\n\nGoodby, cruel world."
+    value = "Hello, world!\n\nGoodbye, cruel world."
     ms3 = boto.connect_s3()
     bkt = ms3.create_bucket('furi')
     key = boto.s3.key.Key(bkt, 'foo/bar/bizz/buzz')
@@ -88,8 +88,8 @@ def test_s3_stream():
 
 
 @moto.mock_s3
-def test_exists():
-    value = "Hello, world!\n\nGoodby, cruel world."
+def test_s3_exists():
+    value = "Hello, world!\n\nGoodbye, cruel world."
     ms3 = boto.connect_s3()
     bkt = ms3.create_bucket('furi')
     key = boto.s3.key.Key(bkt, 'foo/bar/bizz/buzz')
@@ -100,7 +100,7 @@ def test_exists():
 
 
 @moto.mock_s3
-def test_not_exists():
+def test_s3_not_exists():
     ms3 = boto.connect_s3()
     bkt = ms3.create_bucket('furi')
 
@@ -109,34 +109,34 @@ def test_not_exists():
 
 
 @moto.mock_s3
-def test_s3_write():
+def test_s3_read():
     ms3 = boto.connect_s3()
     bkt = ms3.create_bucket('furi')
     key = boto.s3.key.Key(bkt)
     key.name = 'foo/bar/bizz/buzz'
-    value = "Hello, world!\n\nGoodby, cruel world."
+    value = "Hello, world!\n\nGoodbye, cruel world.".encode("utf-8")
     key.set_contents_from_string(value)
 
     with furi.open('s3://furi/foo/bar/bizz/buzz', mode='w') as s3furi:
-        yield assert_equal, s3furi.read(), value
+        assert_equal(s3furi.read(), value)
 
 
 @moto.mock_s3
-def test_s3_write_stream():
+def test_s3_read_stream():
     ms3 = boto.connect_s3()
     bkt = ms3.create_bucket('furi')
     key = boto.s3.key.Key(bkt)
     key.name = 'foo/bar/bizz/buzz'
-    value = "Hello, world!\n\nGoodby, cruel world."
-    key.set_contents_from_stream(io.StringIO(unicode(value)))
+    value = "Hello, world!\n\nGoodbye, cruel world.".encode("utf-8")
+    key.set_contents_from_string(value)
 
     with furi.open('s3://furi/foo/bar/bizz/buzz', mode='w') as s3furi:
-        yield assert_equal, s3furi.read(), value
+        assert_equal(s3furi.read(), value)
 
 
 @moto.mock_s3
 def test_s3_walk():
-    value = "Hello, world!\n\nGoodby, cruel world."
+    value = "Hello, world!\n\nGoodbye, cruel world."
     ms3 = boto.connect_s3()
     bkt = ms3.create_bucket('furi')
 
@@ -166,7 +166,7 @@ def test_walk():
             if not os.path.exists(fpath):
                 os.makedirs(fpath)
             with open(keyname, 'w') as tmpf:
-                tmpf.write("Hello, world!\n\nGoodby, cruel world.")
+                tmpf.write("Hello, world!\n\nGoodbye, cruel world.")
 
         returned = list(furi.walk('foo'))
         expected = [
