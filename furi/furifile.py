@@ -1,6 +1,8 @@
 """ fURI Files. """
-
-import collections
+try:
+    from collections import abc as collections
+except ImportError:
+    import collections
 import os
 import re
 try:

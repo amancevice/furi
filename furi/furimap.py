@@ -1,6 +1,8 @@
 """ fURI Mappings. """
-
-import collections
+try:
+    from collections import abc as collections
+except ImportError:
+    import collections
 import os
 
 from . import utils

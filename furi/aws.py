@@ -1,6 +1,8 @@
 """ AWS backed File and FileMap implementations. """
-
-import collections
+try:
+    from collections import abc as collections
+except ImportError:
+    import collections
 import os
 import re
 
