@@ -12,9 +12,7 @@ Interact with local &amp; remote files by URI
 ```
 pip install furi # Install basic support
 
-pip install furi[all] # Install AWS & SFTP dependencies
-
-pip intsall furi[aws] # Install AWS dependencies
+pip install furi[aws] # Install AWS dependencies
 
 pip install furi[sftp] # Install SFTP dependencies
 ```
