@@ -1,6 +1,6 @@
 # fURI
 
-[![build](https://travis-ci.org/amancevice/furi.svg?branch=master)](https://travis-ci.org/amancevice/furi)
+[![build](https://travis-ci.com/amancevice/furi.svg?branch=master)](https://travis-ci.com/amancevice/furi)
 [![codecov](https://codecov.io/gh/amancevice/furi/branch/master/graph/badge.svg)](https://codecov.io/gh/amancevice/furi)
 [![pypi](https://badge.fury.io/py/furi.svg)](https://badge.fury.io/py/furi)
 
